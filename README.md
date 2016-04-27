@@ -56,7 +56,7 @@ spring-data-jpa 기능처럼 JdbcTemplate을 이용하여 구현하고자 합니
 	}
 
 > 모든것을 다 만들기는 어려우므로 가장 핵심이 되는 기능을 구현하기로 한다.
-> [테스트코드]()
+> [테스트코드](https://github.com/jihwan/spring-data-jdbc/blob/master/src/test/java/info/zhwan/data/jdbc/repository/support/JdbcRepositoryFactoryTest.java)
 
 # 참고
 [spring-data-rest sample](https://spring.io/guides/gs/accessing-data-rest/)
