@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import study.domain.Factory;
 import study.domain.FactoryDao;
@@ -18,7 +19,8 @@ public class JdbcRepositoryFactoryTest {
 	Factory factory;
 	Machine machine;
 	
-	JdbcRepositoryFactory jdbcRepositoryFactory = new JdbcRepositoryFactory();
+	JdbcTemplate jdbc = new JdbcTemplate();
+	JdbcRepositoryFactory jdbcRepositoryFactory = new JdbcRepositoryFactory(jdbc);
 	
 	@Before
 	public void before() {

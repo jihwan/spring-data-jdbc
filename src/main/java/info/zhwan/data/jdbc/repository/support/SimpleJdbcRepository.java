@@ -5,9 +5,20 @@ import java.io.Serializable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.context.MappingContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import info.zhwan.data.jdbc.repository.JdbcRepository;
 
+/**
+ * 
+ * {@link JdbcTemplate}, {@link MappingContext}, RowMapper, RowUnMapper, JdbcEntityInformation, SqlDialect 등을 만들어야 한다.
+ * 
+ * @author zhwan
+ *
+ * @param <T>
+ * @param <ID>
+ */
 public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRepository<T, ID> {
 	
 	@Override
