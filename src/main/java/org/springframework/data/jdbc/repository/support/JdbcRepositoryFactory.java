@@ -1,7 +1,8 @@
-package info.zhwan.data.jdbc.repository.support;
+package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
 
+import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
@@ -12,12 +13,16 @@ import org.springframework.util.Assert;
 
 public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 
-	JdbcTemplate jdbcTemplate;
+	private final JdbcTemplate jdbcTemplate;
+	private final JdbcMappingContext jdbcMappingContext;
+//	private final MappingContext<? extends JdbcPersistentEntity<?>, JdbcPersistentProperty> mappingContext;
 	
-	public JdbcRepositoryFactory(JdbcTemplate jdbcTemplate) {
+	public JdbcRepositoryFactory(JdbcTemplate jdbcTemplate, JdbcMappingContext jdbcMappingContext) {
 		Assert.notNull(jdbcTemplate);
+		Assert.notNull(jdbcMappingContext);
 		
 		this.jdbcTemplate = jdbcTemplate;
+		this.jdbcMappingContext = jdbcMappingContext;
 	}
 
 	@Override

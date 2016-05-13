@@ -1,9 +1,11 @@
-package info.zhwan.data.jdbc.repository.support;
+package org.springframework.data.jdbc.repository.support;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.jdbc.mapping.JdbcMappingContext;
+import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import study.domain.Factory;
@@ -20,7 +22,8 @@ public class JdbcRepositoryFactoryTest {
 	Machine machine;
 	
 	JdbcTemplate jdbc = new JdbcTemplate();
-	JdbcRepositoryFactory jdbcRepositoryFactory = new JdbcRepositoryFactory(jdbc);
+	JdbcMappingContext jmc = new JdbcMappingContext();
+	JdbcRepositoryFactory jdbcRepositoryFactory = new JdbcRepositoryFactory(jdbc, jmc);
 	
 	@Before
 	public void before() {

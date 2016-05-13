@@ -20,7 +20,10 @@ repositories {
 dependencies {
 	compile ('org.springframework:spring-context:4.+')
 	compile ('org.springframework:spring-jdbc:4.+')
+	compile ('org.springframework:spring-orm:4.+')
 	compile ('org.springframework.data:spring-data-commons:1.+')
+	
+	compile ('org.hibernate:hibernate-entitymanager:4.+')
 //	compile ('org.springframework:spring-context:4.2.5.RELEASE')
 //	compile ('org.springframework:spring-jdbc:4.2.5.RELEASE')
 //	compile ('org.springframework.data:spring-data-commons:1.11.4.RELEASE')
@@ -36,7 +39,6 @@ dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile ('org.springframework:spring-test:4.+')
-//    testCompile ('org.springframework:spring-test:4.2.5.RELEASE')
     testCompile ('org.springframework.boot:spring-boot-starter-jdbc:1.+')
     testCompile ('com.h2database:h2:1.4.191')
 }

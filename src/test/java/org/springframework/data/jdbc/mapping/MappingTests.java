@@ -1,15 +1,14 @@
-package info.zhwan.data.mapping;
+package org.springframework.data.jdbc.mapping;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.data.mapping.model.BasicPersistentEntity;
 
 import study.domain.Factory;
 
 public class MappingTests {
 
 	JdbcMappingContext context;
-	BasicPersistentEntity<Object, JdbcPersistentProperty> pe;
+	JdbcPersistentEntityImpl<?> pe;
 	
 	@Before
 	public void setup() {

@@ -1,4 +1,4 @@
-package info.zhwan.data.jdbc.repository.config;
+package org.springframework.data.jdbc.repository.config;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -30,7 +30,7 @@ public class EnableJdbcRepositoriesTest {
 	
 	
 	@Configuration
-	@Import(H2JavaConfig.class)
+	@Import({H2JavaConfig.class})
 	@EnableJdbcRepositories(basePackageClasses={
 			FactoryDao.class
 	})

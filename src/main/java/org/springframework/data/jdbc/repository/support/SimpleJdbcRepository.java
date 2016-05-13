@@ -1,14 +1,13 @@
-package info.zhwan.data.jdbc.repository.support;
+package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import info.zhwan.data.jdbc.repository.JdbcRepository;
 
 /**
  * 

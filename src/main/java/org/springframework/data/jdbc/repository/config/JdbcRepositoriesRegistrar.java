@@ -1,4 +1,4 @@
-package info.zhwan.data.jdbc.repository.config;
+package org.springframework.data.jdbc.repository.config;
 
 import java.lang.annotation.Annotation;
 

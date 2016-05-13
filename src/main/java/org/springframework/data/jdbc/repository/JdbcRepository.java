@@ -1,4 +1,4 @@
-package info.zhwan.data.jdbc.repository;
+package org.springframework.data.jdbc.repository;
 
 import java.io.Serializable;
 

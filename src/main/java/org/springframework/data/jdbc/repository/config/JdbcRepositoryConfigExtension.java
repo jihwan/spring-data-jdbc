@@ -1,4 +1,4 @@
-package info.zhwan.data.jdbc.repository.config;
+package org.springframework.data.jdbc.repository.config;
 
 //import java.lang.annotation.Annotation;
 //import java.util.Arrays;
@@ -11,15 +11,15 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.data.jdbc.repository.JdbcRepository;
+import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactoryBean;
 import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
 import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
 import org.springframework.data.repository.config.RepositoryConfigurationSource;
 import org.springframework.data.repository.config.XmlRepositoryConfigurationSource;
 import org.springframework.util.StringUtils;
-
-import info.zhwan.data.jdbc.repository.JdbcRepository;
-import info.zhwan.data.jdbc.repository.support.JdbcRepositoryFactoryBean;
 
 public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtensionSupport {
 
@@ -84,14 +84,18 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 	 */
 	@Override
 	public void postProcess(BeanDefinitionBuilder builder, RepositoryConfigurationSource source) {
-
+		
 		String transactionManagerRef = source.getAttribute("transactionManagerRef");
 		builder.addPropertyValue("transactionManager",
 				transactionManagerRef == null ? DEFAULT_TRANSACTION_MANAGER_BEAN_NAME : transactionManagerRef);
 //		builder.addPropertyValue("entityManager", getEntityManagerBeanDefinitionFor(source, source.getSource()));
-//		builder.addPropertyReference("mappingContext", JPA_MAPPING_CONTEXT_BEAN_NAME);
+		
+		
+		builder.addPropertyReference("mappingContext", JDBC_MAPPING_CONTEXT_BEAN_NAME);
 	}
 
+	String JDBC_MAPPING_CONTEXT_BEAN_NAME = "jdbcMappingContext";
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource)
@@ -120,13 +124,12 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 	}
 
 	@Override
-	public void registerBeansForRoot(BeanDefinitionRegistry registry, RepositoryConfigurationSource configurationSource) {
-		super.registerBeansForRoot(registry, configurationSource);
+	public void registerBeansForRoot(BeanDefinitionRegistry registry, RepositoryConfigurationSource config) {
 		
-		
-		// TODO 구현을 해야 함.
-		// MongoRepositoryConfigurationExtension 에서
-		// MongoMappingContext를 등록 한다.
+		super.registerBeansForRoot(registry, config);
+		Object source = config.getSource();
+				
+		registerIfNotAlreadyRegistered(new RootBeanDefinition(JdbcMappingContextFactoryBean.class), registry, JDBC_MAPPING_CONTEXT_BEAN_NAME, source);		
 	}
 	
 	

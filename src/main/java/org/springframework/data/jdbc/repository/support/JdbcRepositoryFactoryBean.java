@@ -1,8 +1,11 @@
-package info.zhwan.data.jdbc.repository.support;
+package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jdbc.mapping.JdbcMappingContext;
+import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
+import org.springframework.data.jdbc.mapping.JdbcPersistentProperty;
 
 //import javax.persistence.EntityManager;
 //import javax.persistence.PersistenceContext;
@@ -28,10 +31,14 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	
 	JdbcTemplate jdbcTemplate;
 	
+//	MappingContext<? extends JdbcPersistentEntity<?>, JdbcPersistentProperty> mappingContext;
+	JdbcMappingContext jdbcMappingContext;
+	
 	@Autowired
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
+	
 
 //	private EntityManager entityManager;
 //
@@ -52,6 +59,8 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	@Override
 	public void setMappingContext(MappingContext<?, ?> mappingContext) {
 		super.setMappingContext(mappingContext);
+		
+		this.jdbcMappingContext = JdbcMappingContext.class.cast(mappingContext);
 	}
 
 	/*
@@ -73,7 +82,7 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	 * @return
 	 */
 	protected RepositoryFactorySupport createRepositoryFactory(JdbcTemplate jdbcTemplate) {
-		return new JdbcRepositoryFactory(jdbcTemplate);
+		return new JdbcRepositoryFactory(jdbcTemplate, jdbcMappingContext);
 	}
 //	/**
 //	 * Returns a {@link RepositoryFactorySupport}.

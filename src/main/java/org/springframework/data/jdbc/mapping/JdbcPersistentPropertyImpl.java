@@ -1,4 +1,4 @@
-package info.zhwan.data.mapping;
+package org.springframework.data.jdbc.mapping;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -8,12 +8,11 @@ import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 
-public class JdbcPersistentProperty extends AnnotationBasedPersistentProperty<JdbcPersistentProperty> {
+public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentProperty<JdbcPersistentProperty> implements JdbcPersistentProperty {
 
-	public JdbcPersistentProperty(Field field, PropertyDescriptor propertyDescriptor,
+	public JdbcPersistentPropertyImpl(Field field, PropertyDescriptor propertyDescriptor,
 			PersistentEntity<?, JdbcPersistentProperty> owner, SimpleTypeHolder simpleTypeHolder) {
 		super(field, propertyDescriptor, owner, simpleTypeHolder);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -21,5 +20,6 @@ public class JdbcPersistentProperty extends AnnotationBasedPersistentProperty<Jd
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }
