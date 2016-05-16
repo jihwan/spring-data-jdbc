@@ -9,4 +9,8 @@ public class JdbcPersistentEntityImpl<T> extends BasicPersistentEntity<T, JdbcPe
 		super(information, null);
 	}
 
+	@Override
+	protected JdbcPersistentProperty returnPropertyIfBetterIdPropertyCandidateOrNull(JdbcPersistentProperty property) {
+		return property.isIdProperty() ? property : null;
+	}
 }

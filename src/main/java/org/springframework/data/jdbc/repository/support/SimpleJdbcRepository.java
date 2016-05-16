@@ -7,11 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.data.mapping.context.MappingContext;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.Assert;
 
 /**
  * 
- * {@link JdbcTemplate}, {@link MappingContext}, RowMapper, RowUnMapper, JdbcEntityInformation, SqlDialect 등을 만들어야 한다.
+ * {@link JdbcTemplate}, RowMapper, RowUnMapper, JdbcEntityInformation, SqlDialect 등을 만들어야 한다.
  * 
  * @author zhwan
  *
@@ -19,6 +21,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @param <ID>
  */
 public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRepository<T, ID> {
+	
+	final JdbcEntityInformation<T, ?> entityInformation;
+	final JdbcOperations jdbcOperations;
+	
+	public SimpleJdbcRepository(JdbcEntityInformation<T, ?> entityInformation, JdbcOperations jdbcOperations) {
+
+		Assert.notNull(entityInformation);
+		Assert.notNull(jdbcOperations);
+
+		this.entityInformation = entityInformation;
+		this.jdbcOperations = jdbcOperations;
+	}
 	
 	@Override
 	public Iterable<T> findAll(Sort sort) {
@@ -34,6 +48,14 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 
 	@Override
 	public <S extends T> S save(S entity) {
+		
+		if (entityInformation.isNew(entity)) {
+			System.err.println("isNew > " + entity);
+		}
+		else {
+			System.err.println("isNotNew > " + entity);
+		}
+		
 		return entity;
 	}
 
