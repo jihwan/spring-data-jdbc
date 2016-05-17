@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.util.Assert;
 
 /**
@@ -22,15 +23,19 @@ import org.springframework.util.Assert;
 public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRepository<T, ID> {
 	
 	final JdbcEntityInformation<T, ?> entityInformation;
-	final JdbcOperations jdbcOperations;
+	final JdbcTemplate jdbcTemplate;
 	
-	public SimpleJdbcRepository(JdbcEntityInformation<T, ?> entityInformation, JdbcOperations jdbcOperations) {
+	public SimpleJdbcRepository(JdbcEntityInformation<T, ?> entityInformation, JdbcTemplate jdbcTemplate) {
 
 		Assert.notNull(entityInformation);
-		Assert.notNull(jdbcOperations);
+		Assert.notNull(jdbcTemplate);
 
 		this.entityInformation = entityInformation;
-		this.jdbcOperations = jdbcOperations;
+		this.jdbcTemplate = jdbcTemplate;
+		
+		
+		
+		
 	}
 	
 	@Override
@@ -50,11 +55,17 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 		
 		if (entityInformation.isNew(entity)) {
 			System.err.println("isNew > " + entity);
+			return insert(entity);
 		}
 		else {
 			System.err.println("isNotNew > " + entity);
+			return entity;
 		}
+	}
+
+	public <S extends T> S insert(S entity) {
 		
+  		entityInformation.entity2Map(entity);
 		return entity;
 	}
 
@@ -115,7 +126,5 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 	@Override
 	public void deleteAll() {
 		// TODO Auto-generated method stub
-		
 	}
-
 }

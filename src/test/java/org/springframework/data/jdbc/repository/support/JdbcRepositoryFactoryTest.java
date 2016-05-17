@@ -4,14 +4,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.jdbc.domain.sample.Factory;
+import org.springframework.data.jdbc.domain.sample.FactoryDao;
+import org.springframework.data.jdbc.domain.sample.Machine;
+import org.springframework.data.jdbc.domain.sample.MachineDao;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import study.domain.Factory;
-import study.domain.FactoryDao;
-import study.domain.Machine;
-import study.domain.MachineDao;
 
 public class JdbcRepositoryFactoryTest {
 	
@@ -40,7 +39,7 @@ public class JdbcRepositoryFactoryTest {
 		
 		MachineDao machineDao = jdbcRepositoryFactory.getRepository(MachineDao.class);
 		Machine m = machineDao.save(machine);
-		assertEquals(machineName, m.getName());
+		assertEquals(machineName, m.getId());
 	}
 
 }

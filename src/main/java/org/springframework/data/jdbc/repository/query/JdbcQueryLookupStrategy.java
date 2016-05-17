@@ -53,6 +53,12 @@ public final class JdbcQueryLookupStrategy {
 				JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping);
 	}
 
+	/**
+	 * 이것을 만드는 것은 현상황에서 하기에는 시간과 노력이 많이 투자된다.
+	 * 일단 쉽게 할 수 있는 것 부터 해 보자
+	 * @author zhwan
+	 *
+	 */
 	private static class CreateQueryLookupStrategy extends AbstractQueryLookupStrategy {
 		public CreateQueryLookupStrategy(JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
 			super(jdbcOperations, jdbcMapping);
@@ -61,7 +67,7 @@ public final class JdbcQueryLookupStrategy {
 		@Override
 		public RepositoryQuery doResolveQuery(JdbcQueryMethod queryMethod, NamedQueries namedQueries,
 				JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
-			return new DummyJdbcQuery(queryMethod);
+			throw new UnsupportedOperationException("now this function is not support.");
 		}
 	}
 	
@@ -73,11 +79,12 @@ public final class JdbcQueryLookupStrategy {
 		@Override
 		public RepositoryQuery doResolveQuery(JdbcQueryMethod queryMethod, NamedQueries namedQueries,
 				JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
-			return new DummyJdbcQuery(queryMethod);
+			return new SqlJdbcQuery(queryMethod, jdbcOperations);
 		}
 	}
 	
 	private static class CreateIfNotFoundQueryLookupStrategy extends AbstractQueryLookupStrategy {
+		
 		public CreateIfNotFoundQueryLookupStrategy(JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
 			super(jdbcOperations, jdbcMapping);
 		}
@@ -85,7 +92,7 @@ public final class JdbcQueryLookupStrategy {
 		@Override
 		public RepositoryQuery doResolveQuery(JdbcQueryMethod queryMethod, NamedQueries namedQueries,
 				JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
-			return new DummyJdbcQuery(queryMethod);
+			return new SqlJdbcQuery(queryMethod, jdbcOperations);
 		}
 	}
 

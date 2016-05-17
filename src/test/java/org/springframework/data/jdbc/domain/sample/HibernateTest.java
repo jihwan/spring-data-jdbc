@@ -1,3 +1,4 @@
+package org.springframework.data.jdbc.domain.sample;
 //package study.domain;
 //
 //import javax.persistence.EntityManagerFactory;

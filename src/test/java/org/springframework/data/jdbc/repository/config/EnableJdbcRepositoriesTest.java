@@ -9,13 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.data.jdbc.domain.sample.Address;
+import org.springframework.data.jdbc.domain.sample.Bar;
+import org.springframework.data.jdbc.domain.sample.Factory;
+import org.springframework.data.jdbc.domain.sample.FactoryDao;
+import org.springframework.data.jdbc.domain.sample.Foo;
+import org.springframework.data.jdbc.domain.sample.FooDao;
+import org.springframework.data.jdbc.domain.sample.Machine;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import study.domain.Factory;
-import study.domain.FactoryDao;
-import study.domain.Machine;
 import testconfig.H2JavaConfig;
 import util.BeanDefinitionUtils;
 
@@ -29,13 +33,30 @@ public class EnableJdbcRepositoriesTest {
 	@Autowired
 	JdbcRepository<Factory, String> factoryDao;
 	
+	@Autowired
+	FooDao fooDao;
+	
 	final String factoryName = "T";
+	Address address;
 	Factory factory;
 	Machine machine;
 	
+	Foo foo;
+	Bar bar;
+
 	@Before
 	public void before() {
+		
+		address = new Address();
+		address.setStreet("street1");
+		
 		factory = new Factory(factoryName);
+		factory.setAddress(address);
+		
+		bar = new Bar("a", "b");
+		foo = new Foo(bar);
+		foo.setName("foo");
+		foo.setAddr(address);
 	}
 	
 	@Test
@@ -43,7 +64,10 @@ public class EnableJdbcRepositoriesTest {
 		assertNotNull(context);
 		BeanDefinitionUtils.printBeanDefinitions(context);
 		
-		factoryDao.save(factory);
+//		factoryDao.save(factory);
+		
+		fooDao.save(foo);
+		fooDao.findByName("foo");
 	}
 	
 	

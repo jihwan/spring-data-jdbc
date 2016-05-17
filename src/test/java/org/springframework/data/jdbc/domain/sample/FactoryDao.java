@@ -1,4 +1,4 @@
-package study.domain;
+package org.springframework.data.jdbc.domain.sample;
 
 import java.util.List;
 

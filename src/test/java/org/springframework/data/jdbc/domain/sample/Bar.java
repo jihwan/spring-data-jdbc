@@ -1,11 +1,13 @@
-package study.domain;
+package org.springframework.data.jdbc.domain.sample;
+
+import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
 import lombok.Data;
 
 @Data @Embeddable
-public class Bar {
+public class Bar implements Serializable {
 
 	String a;
 	String b;

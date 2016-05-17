@@ -3,6 +3,7 @@ package org.springframework.data.jdbc.repository.config;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 
 import org.springframework.beans.BeansException;
@@ -53,6 +54,12 @@ class JdbcMappingContextFactoryBean extends AbstractFactoryBean<JdbcMappingConte
 		return jdbcMappingContext;
 	}
 	
+	/**
+	 * Entity(Domain object)의 대상은 {@link Entity}, {@link Embeddable} 이다.
+	 * 
+	 * @return
+	 * @throws ClassNotFoundException
+	 */
 	private Set<Class<?>> getInitialEntitySet() throws ClassNotFoundException {
 		
 		Set<Class<?>> entitySet = new HashSet<Class<?>>();
@@ -61,6 +68,7 @@ class JdbcMappingContextFactoryBean extends AbstractFactoryBean<JdbcMappingConte
 		scanner.setEnvironment(applicationContext.getEnvironment());
 		scanner.setResourceLoader(this.resourceLoader);
 		scanner.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
+		scanner.addIncludeFilter(new AnnotationTypeFilter(Embeddable.class));
 //		scanner.addIncludeFilter(new AnnotationTypeFilter(Persistent.class));
 		for (String basePackage : getBasePackages()) {
 			if (StringUtils.hasText(basePackage)) {

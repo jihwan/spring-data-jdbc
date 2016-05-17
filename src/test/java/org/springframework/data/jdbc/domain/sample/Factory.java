@@ -1,5 +1,7 @@
-package study.domain;
+package org.springframework.data.jdbc.domain.sample;
 
+import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -17,15 +19,31 @@ public class Factory implements JdbcPersistable<Factory, String> {
 	@Id
 	String name;
 	
+	@Column
 	String description;
 	
+	@Column
 	String factoryType;
+	
+//	@Transient
+//	@Column
+	String dummy;
+	
+	@Embedded
+	Address address;
 	
 	public Factory() {}
 
 	public Factory(String name) {
 		super();
 		this.name = name;
+	}
+	
+	public static Factory instance(String name, String desc, String type) {
+		Factory factory = new Factory(name);
+		factory.setDescription(desc);
+		factory.setFactoryType(type);
+		return factory;
 	}
 
 	@Override

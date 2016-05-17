@@ -51,7 +51,8 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 
 		if(JdbcPersistable.class.isAssignableFrom(domainClass)) {
 			JdbcPersistentEntityImpl<?> entity = jdbcMappingContext.getPersistentEntity(domainClass);
-			return new JdbcPersistableEntityInformation(entity);
+//			return new JdbcPersistableEntityInformation(entity);
+			return new JdbcPersistableEntityInformation(entity, jdbcMappingContext);
 		} else {
 			throw new IllegalStateException(domainClass + " must implementation JdbcPersistable interface");
 		}

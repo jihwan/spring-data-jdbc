@@ -6,6 +6,8 @@ import org.springframework.data.repository.core.EntityInformation;
 
 public interface JdbcEntityInformation<T, ID extends Serializable> extends EntityInformation<T, ID> {
 
+	void entity2Map(T entity);
+	
 //	/**
 //	 * Returns the id attribute of the entity.
 //	 * 

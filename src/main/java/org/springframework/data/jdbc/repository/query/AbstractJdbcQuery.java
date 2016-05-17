@@ -1,9 +1,12 @@
 package org.springframework.data.jdbc.repository.query;
 
+import org.springframework.data.jdbc.repository.query.JdbcQueryExecution.CollectionExecution;
+import org.springframework.data.jdbc.repository.query.JdbcQueryExecution.SingleEntityExecution;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.data.repository.query.ResultProcessor;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.util.Assert;
 
 /**
@@ -13,13 +16,15 @@ import org.springframework.util.Assert;
  * @author zhwan
  *
  */
-public class AbstractJdbcQuery implements RepositoryQuery {
+public abstract class AbstractJdbcQuery implements RepositoryQuery {
 
-	private final JdbcQueryMethod method;
+	protected final JdbcQueryMethod method;
+	protected final JdbcOperations jdbcOperations;
 	
-	public AbstractJdbcQuery(JdbcQueryMethod method) {
+	public AbstractJdbcQuery(JdbcQueryMethod method, JdbcOperations jdbcOperations) {
 		Assert.notNull(method);
 		this.method = method;
+		this.jdbcOperations = jdbcOperations;
 	}
 	
 	@Override
@@ -34,19 +39,41 @@ public class AbstractJdbcQuery implements RepositoryQuery {
 	 */
 	private Object doExecute(JdbcQueryExecution execution, Object[] values) {
 
-		Object result = execution.execute(this, values);
-
 		ParametersParameterAccessor accessor = new ParametersParameterAccessor(method.getParameters(), values);
-		ResultProcessor withDynamicProjection = method.getResultProcessor().withDynamicProjection(accessor);
+		ResultProcessor processor = method.getResultProcessor().withDynamicProjection(accessor);
+		
+		Object result = execution.execute(this, values, processor.getReturnedType().getDomainType());
 
-		return withDynamicProjection.processResult(result);
-//		return withDynamicProjection. processResult(result, TupleConverter.INSTANCE);
+		return result;
 	}
+
+	protected abstract Query createQuery();
 
 	private JdbcQueryExecution getExecution() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if (method.isCollectionQuery()) {
+			return new CollectionExecution();
+		} else {
+			return new SingleEntityExecution();
+		}
+		
+//		if (method.isStreamQuery()) {
+//			return new StreamExecution();
+//		} else if (method.isProcedureQuery()) {
+//			return new ProcedureExecution();
+//		} else if (method.isCollectionQuery()) {
+//			return new CollectionExecution();
+//		} else if (method.isSliceQuery()) {
+//			return new SlicedExecution(method.getParameters());
+//		} else if (method.isPageQuery()) {
+//			return new PagedExecution(method.getParameters());
+//		} else if (method.isModifyingQuery()) {
+//			return method.getClearAutomatically() ? new ModifyingExecution(method, em) : new ModifyingExecution(method, null);
+//		} else {
+//			return new SingleEntityExecution();
+//		}
 	}
+	
 
 	@Override
 	public QueryMethod getQueryMethod() {

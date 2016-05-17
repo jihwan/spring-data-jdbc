@@ -1,4 +1,4 @@
-package study.domain;
+package org.springframework.data.jdbc.domain.sample;
 
 import org.springframework.data.jdbc.repository.JdbcRepository;
 

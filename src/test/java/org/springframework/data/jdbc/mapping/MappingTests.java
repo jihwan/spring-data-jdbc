@@ -3,9 +3,8 @@ package org.springframework.data.jdbc.mapping;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import study.domain.Factory;
-import study.domain.Foo;
+import org.springframework.data.jdbc.domain.sample.Factory;
+import org.springframework.data.jdbc.domain.sample.Foo;
 
 public class MappingTests {
 
