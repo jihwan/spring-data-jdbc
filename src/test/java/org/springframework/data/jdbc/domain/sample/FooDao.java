@@ -2,7 +2,7 @@ package org.springframework.data.jdbc.domain.sample;
 
 import java.util.List;
 
-import org.adrianwalker.multilinestring.Multiline;
+//import org.adrianwalker.multilinestring.Multiline;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.data.jdbc.repository.Query;
 

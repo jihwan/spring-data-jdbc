@@ -7,4 +7,7 @@ public interface JdbcPersistentProperty extends PersistentProperty<JdbcPersisten
 	boolean isColumn();
 	
 	boolean isOwnerEntity();
+
+	void setOwnerFieldName(String name);
+	String getOwnerFieldName();
 }

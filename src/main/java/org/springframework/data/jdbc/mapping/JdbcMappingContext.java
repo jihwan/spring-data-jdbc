@@ -20,8 +20,32 @@ public class JdbcMappingContext extends
 	protected JdbcPersistentProperty createPersistentProperty(Field field, PropertyDescriptor descriptor,
 			JdbcPersistentEntityImpl<?> owner, SimpleTypeHolder simpleTypeHolder) {
 		
-		JdbcPersistentPropertyImpl jpaPersistentPropertyImpl = new JdbcPersistentPropertyImpl(field, descriptor, owner, simpleTypeHolder);
-		return jpaPersistentPropertyImpl;
+		System.out.println(">>>>>>> " + 
+				(field != null ? field.getName() : ".")  + "\t" +
+				(owner != null ? owner.getType() : "..")
+				);
+		
+		JdbcPersistentPropertyImpl jdbcPersistentPropertyImpl = new JdbcPersistentPropertyImpl(field, descriptor, owner, simpleTypeHolder);
+		
+		if (jdbcPersistentPropertyImpl.isAssociation()) {
+			
+			if( owner != null && field != null) {
+				
+				owner.setFieldName(field.getName());
+				
+				jdbcPersistentPropertyImpl.setOwnerFieldName(field.getName());
+				
+				
+//				jpaPersistentPropertyImpl.getOwner().g
+			}
+			
+			System.err.println(">>>>>>> " + 
+					(field != null ? field.getName() : ".")  + "\t" +
+					(owner != null ? owner.getType() : "..")
+					);
+		}
+		
+		return jdbcPersistentPropertyImpl;
 	}
 
 

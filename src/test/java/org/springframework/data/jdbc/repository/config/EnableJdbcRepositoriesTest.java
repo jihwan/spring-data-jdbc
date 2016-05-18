@@ -63,7 +63,7 @@ public class EnableJdbcRepositoriesTest {
 		address.setStreet("street1");
 		
 		factory = new Factory(factoryName);
-		factory.setAddress(address);
+		factory.setAddress1(address);
 		
 		bar = new Bar("a", "b");
 		foo = new Foo(bar);

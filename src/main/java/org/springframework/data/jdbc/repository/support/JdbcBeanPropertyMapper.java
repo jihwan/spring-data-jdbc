@@ -1,9 +1,11 @@
 package org.springframework.data.jdbc.repository.support;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,9 +71,22 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 			PropertyDescriptor pd = pds[i];
 			JdbcPersistentProperty persistentProperty = 
 					persistentEntity.getPersistentProperty(pd.getName());
+			
+			
+			
 			if (pd.getWriteMethod() != null && persistentProperty != null) {
 				
+				System.out.println( associatedPropertyClass + "\t" + persistentProperty.getOwnerFieldName()  );
+				
+				
+				
 				if (persistentProperty.isAssociation()) {
+					
+					/**
+					 * important!!!
+					 */
+//					persistentProperty.setOwnerFieldName(pd.getName());
+					
 					resolvePersistentEntity(persistentProperty.getActualType());
 				}
 				else {
@@ -105,8 +120,6 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 		T mappedObject = BeanUtils.instantiate(this.mappedClass);
 		BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(mappedObject);
 		
-		BeanWrapper compositeBw = null;
-		
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int columnCount = rsmd.getColumnCount();
 
@@ -119,29 +132,63 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 			}
 			
 			
+			PersistentEntity<?, JdbcPersistentProperty> ownerEntity = jdbcPersistentProperty.getOwner();
+			
+			System.out.println( ">>>>>" + "\t" + jdbcPersistentProperty.getOwnerFieldName()  + "\t" + ownerEntity.getPersistentProperty(jdbcPersistentProperty.getOwnerFieldName()).getOwnerFieldName());
+			
 //			jdbcPersistentProperty.isEntity()
 			
-			PersistentEntity<?, JdbcPersistentProperty> entity = 
-					jdbcPersistentProperty.getOwner();
 			
 			
 			
 			
 			
-//			PersistentPropertyAccessor propertyAccessor = entity.getPropertyAccessor(bw);
-//			System.out.println(propertyAccessor);
 			Object columnValue = getColumnValue(rs, index, jdbcPersistentProperty);
 			
-//			bw.setPropertyValue(jdbcPersistentProperty.getName(), columnValue);
+			if (ownerEntity.getType() == getMappedClass()) {
+//				PersistentPropertyAccessor propertyAccessor = entity.getPropertyAccessor(bw);
+//				System.out.println(propertyAccessor);
+				bw.setPropertyValue(jdbcPersistentProperty.getName(), columnValue);
+				System.err.println(
+						column.toLowerCase() + "\t" + 
+								jdbcPersistentProperty.getName() + "\t" + 
+								columnValue + "\t" + 
+								ownerEntity.getIdProperty() + "\t ownerName:" + 
+								ownerEntity.getName() + "\t" + 
+								jdbcPersistentProperty
+						);
+			}
+			else {
+				
+				JdbcPersistentEntityImpl<?> persistentEntity = jdbcMappingContext.getPersistentEntity(ownerEntity.getType());
+//				System.out.println( persistentEntity );
+				
+//				PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(jdbcPersistentProperty.getClass());
+//				System.err.println(propertyDescriptors);
+				
+				
+				BeanWrapper associationBw = PropertyAccessorFactory.forBeanPropertyAccess(BeanUtils.instantiate(ownerEntity.getType()));
+				
+				associationBw.setPropertyValue(jdbcPersistentProperty.getName(), columnValue);
+				
+//				bw.setPropertyValue(column.toLowerCase(), associationBw.getWrappedInstance());
+				
+				
+//				System.out.println(
+//						jdbcPersistentProperty.getOwnerFieldName() + "\t" + 
+//						
+//						column.toLowerCase() + "\t" + 
+//								jdbcPersistentProperty.getName() + "\t" + 
+//								columnValue + "\t" + 
+//								ownerEntity.getIdProperty() + "\t ownerName:" + 
+//								ownerEntity.getName() + "\t" + 
+//								jdbcPersistentProperty
+//						);
+			}
 			
-			System.err.println(
-					column.toLowerCase() + "\t" + 
-					jdbcPersistentProperty.getName() + "\t" + 
-					columnValue + "\t" + 
-					entity.getIdProperty() + "\t ownerName:" + 
-					entity.getName() + "\t" + 
-					jdbcPersistentProperty
-			);
+			
+			
+			
 			
 			
 			

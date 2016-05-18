@@ -12,6 +12,8 @@ public class Bar implements Serializable {
 	String a;
 	String b;
 	
+	public Bar() {}
+	
 	public Bar(String a, String b) {
 		super();
 		this.a = a;

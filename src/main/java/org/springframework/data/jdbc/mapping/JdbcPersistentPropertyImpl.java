@@ -20,9 +20,12 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
+import org.springframework.data.mapping.model.FieldNamingStrategy;
+import org.springframework.data.mapping.model.PropertyNameFieldNamingStrategy;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 import org.springframework.data.util.ClassTypeInformation;
 import org.springframework.data.util.TypeInformation;
+import org.springframework.util.StringUtils;
 
 public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentProperty<JdbcPersistentProperty> implements JdbcPersistentProperty {
 
@@ -166,5 +169,32 @@ public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentPropert
 		}
 
 		return null;
+	}
+
+	String ownerFieldName;
+	
+	@Override
+	public void setOwnerFieldName(String name) {
+		this.ownerFieldName = name;
+	}
+
+	@Override
+	public String getOwnerFieldName() {
+//		return this.ownerFieldName;
+		return getFieldName();
+	}
+	
+	
+	public String getFieldName() {
+		
+		FieldNamingStrategy fieldNamingStrategy = PropertyNameFieldNamingStrategy.INSTANCE;
+
+		String fieldName = fieldNamingStrategy.getFieldName(this);
+
+		if (!StringUtils.hasText(fieldName)) {
+			throw new RuntimeException("ddddddddddddddddd");
+		}
+
+		return fieldName;
 	}
 }

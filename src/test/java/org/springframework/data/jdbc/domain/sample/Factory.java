@@ -30,7 +30,7 @@ public class Factory implements JdbcPersistable<Factory, String> {
 	String dummy;
 	
 	@Embedded
-	Address address;
+	Address address1;
 	
 	public Factory() {}
 

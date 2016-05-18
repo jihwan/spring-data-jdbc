@@ -21,4 +21,6 @@ public class Address {
 	
 	@Column()
 	private Double no;
+	
+	public Address() {}
 }

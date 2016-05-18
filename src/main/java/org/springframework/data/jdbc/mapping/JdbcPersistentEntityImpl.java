@@ -13,4 +13,14 @@ public class JdbcPersistentEntityImpl<T> extends BasicPersistentEntity<T, JdbcPe
 	protected JdbcPersistentProperty returnPropertyIfBetterIdPropertyCandidateOrNull(JdbcPersistentProperty property) {
 		return property.isIdProperty() ? property : null;
 	}
+
+	String fieldName;
+	
+	public void setFieldName(String name) {
+		this.fieldName = name;
+	}
+	
+	public String getFieldName() {
+		return fieldName;
+	}
 }
