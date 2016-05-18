@@ -20,10 +20,10 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 	JdbcPersistentEntity<T> persistentEntity;
 	JdbcMappingContext jdbcMappingContext;
 	
-	public JdbcPersistableEntityInformation(JdbcPersistentEntity<T> entity) {
-		super(entity);
-		this.persistentEntity = entity;
-	}
+//	public JdbcPersistableEntityInformation(JdbcPersistentEntity<T> entity) {
+//		super(entity);
+//		this.persistentEntity = entity;
+//	}
 	
 	public JdbcPersistableEntityInformation(JdbcPersistentEntity<T> entity, JdbcMappingContext jdbcMappingContext) {
 		super(entity);
@@ -34,6 +34,16 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 	@Override
 	public boolean isNew(T entity) {
 		return entity.isNew();
+	}
+	
+	@Override
+	public JdbcPersistentEntity<T> getJdbcPersistentEntity() {
+		return this.persistentEntity;
+	}
+	
+	@Override
+	public JdbcMappingContext getJdbcMappingContext() {
+		return this.jdbcMappingContext;
 	}
 	
 	@Override
@@ -49,21 +59,24 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 			JdbcPersistentEntityImpl<?> associationEntity = jdbcMappingContext.getPersistentEntity(idProperty);
 			Object associationValue =  bw.getPropertyValue(idProperty.getName());
 			
-			compositeBw = PropertyAccessorFactory.forBeanPropertyAccess(associationValue);
-			
-			PropertyDescriptor[] pdescs = BeanUtils.getPropertyDescriptors(idProperty.getActualType());
-			
-			for (PropertyDescriptor pdesc : pdescs) {
-				JdbcPersistentProperty persistentProperty2 = associationEntity.getPersistentProperty(pdesc.getName());
-				if (persistentProperty2 != null) {
-					
-					if ( persistentProperty2.isColumn() ) {
+			if(associationValue != null) {
+				compositeBw = PropertyAccessorFactory.forBeanPropertyAccess(associationValue);
+				
+				PropertyDescriptor[] pdescs = BeanUtils.getPropertyDescriptors(idProperty.getActualType());
+				
+				for (PropertyDescriptor pdesc : pdescs) {
+					JdbcPersistentProperty persistentProperty2 = associationEntity.getPersistentProperty(pdesc.getName());
+					if (persistentProperty2 != null) {
 						
-						Object propertyValue = compositeBw.getPropertyValue(persistentProperty2.getName());
-						System.err.println( persistentProperty2.getName() + "\t" + propertyValue );
+						if ( persistentProperty2.isColumn() ) {
+							
+							Object propertyValue = compositeBw.getPropertyValue(persistentProperty2.getName());
+							System.err.println( persistentProperty2.getName() + "\t" + propertyValue );
+						}
 					}
 				}
 			}
+			
 		}
 		else {
 			Object propertyValue = bw.getPropertyValue(idProperty.getName());
@@ -87,6 +100,11 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 					
 					JdbcPersistentEntityImpl<?> associationEntity = jdbcMappingContext.getPersistentEntity(persistentProperty);
 					Object associationValue =  bw.getPropertyValue(persistentProperty.getName());
+					
+					if(associationValue == null) {
+						continue;
+					}
+					
 					compositeBw = PropertyAccessorFactory.forBeanPropertyAccess(associationValue);
 					
 					PropertyDescriptor[] pdescs = BeanUtils.getPropertyDescriptors(persistentProperty.getActualType());

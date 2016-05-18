@@ -1,5 +1,6 @@
 package org.springframework.data.jdbc.repository.query;
 
+import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.repository.query.JdbcQueryExecution.CollectionExecution;
 import org.springframework.data.jdbc.repository.query.JdbcQueryExecution.SingleEntityExecution;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
@@ -20,11 +21,13 @@ public abstract class AbstractJdbcQuery implements RepositoryQuery {
 
 	protected final JdbcQueryMethod method;
 	protected final JdbcOperations jdbcOperations;
+	protected final JdbcMappingContext jdbcMapping;
 	
-	public AbstractJdbcQuery(JdbcQueryMethod method, JdbcOperations jdbcOperations) {
+	public AbstractJdbcQuery(JdbcQueryMethod method, JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
 		Assert.notNull(method);
 		this.method = method;
 		this.jdbcOperations = jdbcOperations;
+		this.jdbcMapping = jdbcMapping;
 	}
 	
 	@Override
@@ -41,6 +44,8 @@ public abstract class AbstractJdbcQuery implements RepositoryQuery {
 
 		ParametersParameterAccessor accessor = new ParametersParameterAccessor(method.getParameters(), values);
 		ResultProcessor processor = method.getResultProcessor().withDynamicProjection(accessor);
+		
+		
 		
 		Object result = execution.execute(this, values, processor.getReturnedType().getDomainType());
 

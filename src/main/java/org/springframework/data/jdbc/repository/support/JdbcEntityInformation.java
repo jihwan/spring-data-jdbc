@@ -2,10 +2,16 @@ package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
 
+import org.springframework.data.jdbc.mapping.JdbcMappingContext;
+import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
 import org.springframework.data.repository.core.EntityInformation;
 
 public interface JdbcEntityInformation<T, ID extends Serializable> extends EntityInformation<T, ID> {
 
+	JdbcPersistentEntity<T> getJdbcPersistentEntity();
+	
+	JdbcMappingContext getJdbcMappingContext();
+	
 	void entity2Map(T entity);
 	
 //	/**

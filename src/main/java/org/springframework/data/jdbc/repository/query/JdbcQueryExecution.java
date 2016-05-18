@@ -1,6 +1,8 @@
 package org.springframework.data.jdbc.repository.query;
 
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.data.jdbc.mapping.JdbcMappingContext;
+import org.springframework.data.jdbc.repository.support.JdbcBeanPropertyMapper;
+import org.springframework.jdbc.core.JdbcOperations;
 
 interface JdbcQueryExecution {
 
@@ -11,8 +13,11 @@ interface JdbcQueryExecution {
 		@Override
 		public Object execute(AbstractJdbcQuery query, Object[] values, Class<?> domainClass) {
 			
+			JdbcOperations jdbcOperations = query.jdbcOperations;
+			JdbcMappingContext jdbcMapping = query.jdbcMapping;
 			String sql = query.createQuery().getSql();
-			return query.jdbcOperations.query(sql, values, BeanPropertyRowMapper.newInstance(domainClass));
+			
+			return jdbcOperations.query(sql, values, JdbcBeanPropertyMapper.newInstance(domainClass, jdbcMapping));
 		}
 	}
 	
@@ -20,8 +25,11 @@ interface JdbcQueryExecution {
 
 		@Override
 		public Object execute(AbstractJdbcQuery query, Object[] values, Class<?> domainClass) {
+			JdbcOperations jdbcOperations = query.jdbcOperations;
+			JdbcMappingContext jdbcMapping = query.jdbcMapping;
 			String sql = query.createQuery().getSql();
-			return query.jdbcOperations.queryForObject(sql, values, BeanPropertyRowMapper.newInstance(domainClass));
+			
+			return jdbcOperations.queryForObject(sql, values, JdbcBeanPropertyMapper.newInstance(domainClass, jdbcMapping));
 		}
 	}
 }

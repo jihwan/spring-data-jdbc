@@ -126,9 +126,12 @@ public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentPropert
 	@Override
 	public boolean isColumn() {
 		
-		if (isTransient() || isAssociation() || isIdProperty()) {
+		if (isTransient() || isIdProperty()) {
 			return false;
 		}
+//		if (isTransient() || isAssociation() || isIdProperty()) {
+//			return false;
+//		}
 		
 		if (isAnnotationPresent(Column.class)) {
 			return true;
@@ -136,6 +139,18 @@ public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentPropert
 		
 		// 일반 field일 경우에도 Column 취급 한다.
 		return true;
+	}
+	
+	@Override
+	public boolean isOwnerEntity() {
+		
+		
+		if (getOwner() != null) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	private TypeInformation<?> detectAssociationTargetType() {

@@ -79,7 +79,7 @@ public final class JdbcQueryLookupStrategy {
 		@Override
 		public RepositoryQuery doResolveQuery(JdbcQueryMethod queryMethod, NamedQueries namedQueries,
 				JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
-			return new SqlJdbcQuery(queryMethod, jdbcOperations);
+			return new SqlJdbcQuery(queryMethod, jdbcOperations, jdbcMapping);
 		}
 	}
 	
@@ -92,7 +92,7 @@ public final class JdbcQueryLookupStrategy {
 		@Override
 		public RepositoryQuery doResolveQuery(JdbcQueryMethod queryMethod, NamedQueries namedQueries,
 				JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
-			return new SqlJdbcQuery(queryMethod, jdbcOperations);
+			return new SqlJdbcQuery(queryMethod, jdbcOperations, jdbcMapping);
 		}
 	}
 

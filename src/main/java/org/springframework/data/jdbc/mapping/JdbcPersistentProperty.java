@@ -5,4 +5,6 @@ import org.springframework.data.mapping.PersistentProperty;
 public interface JdbcPersistentProperty extends PersistentProperty<JdbcPersistentProperty> {
 	
 	boolean isColumn();
+	
+	boolean isOwnerEntity();
 }

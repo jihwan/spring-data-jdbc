@@ -6,7 +6,9 @@ import javax.persistence.Id;
 
 import org.springframework.data.jdbc.domain.AbstractJdbcPersistable;
 
-@Entity
+import lombok.Data;
+
+@Entity @Data
 public class Machine extends AbstractJdbcPersistable<Machine, String> {
 	
 	private static final long serialVersionUID = 1L;

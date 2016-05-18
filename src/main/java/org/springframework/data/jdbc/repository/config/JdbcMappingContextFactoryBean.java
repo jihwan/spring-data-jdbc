@@ -68,7 +68,7 @@ class JdbcMappingContextFactoryBean extends AbstractFactoryBean<JdbcMappingConte
 		scanner.setEnvironment(applicationContext.getEnvironment());
 		scanner.setResourceLoader(this.resourceLoader);
 		scanner.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
-		scanner.addIncludeFilter(new AnnotationTypeFilter(Embeddable.class));
+//		scanner.addIncludeFilter(new AnnotationTypeFilter(Embeddable.class));
 //		scanner.addIncludeFilter(new AnnotationTypeFilter(Persistent.class));
 		for (String basePackage : getBasePackages()) {
 			if (StringUtils.hasText(basePackage)) {

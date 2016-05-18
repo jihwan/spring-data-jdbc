@@ -10,7 +10,7 @@ import org.springframework.data.annotation.QueryAnnotation;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @QueryAnnotation
-@Documented
+//@Documented
 public @interface Query {
 
 	/**

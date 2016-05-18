@@ -24,18 +24,18 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 	
 	final JdbcEntityInformation<T, ?> entityInformation;
 	final JdbcTemplate jdbcTemplate;
+	final BeanPropertyMapper<T> beanPropertyMapper;
 	
 	public SimpleJdbcRepository(JdbcEntityInformation<T, ?> entityInformation, JdbcTemplate jdbcTemplate) {
 
 		Assert.notNull(entityInformation);
 		Assert.notNull(jdbcTemplate);
-
+		
+		
 		this.entityInformation = entityInformation;
 		this.jdbcTemplate = jdbcTemplate;
-		
-		
-		
-		
+		this.beanPropertyMapper = 
+				JdbcBeanPropertyMapper.newInstance(entityInformation.getJavaType(), entityInformation.getJdbcMappingContext());
 	}
 	
 	@Override
@@ -65,7 +65,11 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 
 	public <S extends T> S insert(S entity) {
 		
-  		entityInformation.entity2Map(entity);
+		
+		
+		
+		
+//  		entityInformation.entity2Map(entity);
 		return entity;
 	}
 

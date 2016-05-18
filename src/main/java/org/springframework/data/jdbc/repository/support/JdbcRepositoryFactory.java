@@ -62,6 +62,8 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 	@Override
 	protected QueryLookupStrategy getQueryLookupStrategy(Key key, EvaluationContextProvider evaluationContextProvider) {
 		
+		
+		
 		return JdbcQueryLookupStrategy.create(jdbcOperations, jdbcMappingContext, key, evaluationContextProvider);
 	}
 
