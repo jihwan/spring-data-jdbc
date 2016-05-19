@@ -1,22 +1,14 @@
 package org.springframework.data.jdbc.repository.support;
 
-import static org.junit.Assert.*;
-
 import java.beans.PropertyDescriptor;
-import java.util.Collection;
 import java.util.Set;
-
-import javax.persistence.Column;
 
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.jdbc.domain.sample.Factory;
 import org.springframework.data.jdbc.domain.sample.Foo;
-import org.springframework.data.jdbc.domain.sample.Machine;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntityImpl;
 import org.springframework.data.jdbc.mapping.JdbcPersistentProperty;
-import org.springframework.data.util.DirectFieldAccessFallbackBeanWrapper;
 
 import com.google.common.collect.Sets;
 
@@ -25,8 +17,9 @@ public class JdbcPersistableEntityInformationTest {
 	@Test
 	public void test() {
 		
-		JdbcMappingContext jdbcMappingContext = new JdbcMappingContext();
-		Set<Class<?>> initialEntitySet = Sets.newHashSet(Factory.class, Machine.class, Foo.class);
+		Set<Class<?>> initialEntitySet = Sets.newHashSet(Foo.class);
+		
+		JdbcMappingContext jdbcMappingContext = new JdbcMappingContext(initialEntitySet);
 		jdbcMappingContext.setInitialEntitySet(initialEntitySet);
 		jdbcMappingContext.initialize();
 		
@@ -34,7 +27,7 @@ public class JdbcPersistableEntityInformationTest {
 		JdbcPersistentEntityImpl<?> entity = jdbcMappingContext.getPersistentEntity(Foo.class);
 		
 		
-		System.err.println(entity.getPersistentProperty("id").isAssociation());
+//		System.err.println(entity.getPersistentProperty("id").isAssociation());
 		System.err.println( entity.getIdProperty().getActualType() );
 		
 		

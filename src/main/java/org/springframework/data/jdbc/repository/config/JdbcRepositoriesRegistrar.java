@@ -15,7 +15,7 @@ import org.springframework.data.repository.config.RepositoryConfigurationExtensi
 
 /**
  * 
- * @author zhwan
+ * @author Jihwan Hwang
  *
  */
 class JdbcRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {	

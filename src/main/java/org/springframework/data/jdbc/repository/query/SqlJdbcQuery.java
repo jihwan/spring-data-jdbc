@@ -1,12 +1,12 @@
 package org.springframework.data.jdbc.repository.query;
 
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
-import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class SqlJdbcQuery extends AbstractJdbcQuery {
 
-	public SqlJdbcQuery(JdbcQueryMethod method, JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
-		super(method, jdbcOperations, jdbcMapping);
+	public SqlJdbcQuery(JdbcQueryMethod method, JdbcTemplate jdbcTemplate, JdbcMappingContext jdbcMapping) {
+		super(method, jdbcTemplate, jdbcMapping);
 	}
 
 	@Override

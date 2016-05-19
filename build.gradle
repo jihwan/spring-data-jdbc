@@ -4,7 +4,6 @@ apply plugin: 'maven'
 
 sourceCompatibility = 1.8
 version = '1.0.0'
-//spring-version = '4.2.5.RELEASE'
 
 jar {
     manifest {
@@ -21,41 +20,25 @@ repositories {
 }
 
 dependencies {
-	compile ('org.springframework:spring-context:4.+')
 	compile ('org.springframework:spring-jdbc:4.+')
-//	compile ('org.springframework:spring-orm:4.+')
 	compile ('org.springframework.data:spring-data-commons:1.+')
+	compile ('org.eclipse.persistence:javax.persistence:2+')
 	
-//	compile ('org.hibernate:hibernate-entitymanager:4.+')
-//	compile ('org.springframework:spring-context:4.2.5.RELEASE')
-//	compile ('org.springframework:spring-jdbc:4.2.5.RELEASE')
-//	compile ('org.springframework.data:spring-data-commons:1.11.4.RELEASE')
-	
-	
-	compile ('org.eclipse.persistence:javax.persistence:2.1.0') // ????????
-	
-	
-	
-	
-	
-	compile('org.projectlombok:lombok:1.16.6')
-	// http://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
-	compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.2'
-	// http://mvnrepository.com/artifact/com.google.guava/guava
-	compile group: 'com.google.guava', name: 'guava', version: '19.0'
-	
-	compile ('org.adrianwalker:multiline-string:0.1.2')
 
 	
-    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile ('junit:junit:4+')
     testCompile ('org.springframework:spring-test:4.+')
-    testCompile ('org.springframework.security:spring-security-config:4.+')
-    testCompile ('org.springframework.security:spring-security-web:4.+')
-//    testCompile ('org.springframework:spring-webmvc:4.+')
     testCompile ('org.springframework.boot:spring-boot-starter-jdbc:1.+')
     testCompile ('com.h2database:h2:1.4.191')
-    testCompile ('org.apache.tomcat.embed:tomcat-embed-core:8.0.33')
+	
+    testCompile ('org.projectlombok:lombok:1.16.6')
+    testCompile ('com.google.guava:guava:19.0')
+    testCompile ('org.adrianwalker:multiline-string:0.1.2')
+	
+//    testCompile ('org.springframework.security:spring-security-config:4.+')
+//    testCompile ('org.springframework.security:spring-security-web:4.+')
+//    testCompile ('org.springframework:spring-webmvc:4.+')
+//    testCompile ('org.apache.tomcat.embed:tomcat-embed-core:8.0.33')
 }
 
 test {

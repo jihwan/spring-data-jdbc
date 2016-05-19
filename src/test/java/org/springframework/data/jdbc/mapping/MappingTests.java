@@ -1,12 +1,13 @@
 package org.springframework.data.jdbc.mapping;
 
+import java.util.Set;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.jdbc.domain.sample.Bar;
-import org.springframework.data.jdbc.domain.sample.Factory;
 import org.springframework.data.jdbc.domain.sample.Foo;
 
+import com.google.common.collect.Sets;
 import com.sun.jndi.cosnaming.IiopUrl.Address;
 
 public class MappingTests {
@@ -16,7 +17,8 @@ public class MappingTests {
 	
 	@Before
 	public void setup() {
-		context = new JdbcMappingContext();
+		Set<Class<?>> initialEntitySet = Sets.newHashSet(Foo.class);
+		context = new JdbcMappingContext(initialEntitySet);
 //		pe = context.getPersistentEntity(Factory.class);
 	}
 
@@ -33,7 +35,7 @@ public class MappingTests {
 	public void testFoo() throws Exception {
 		
 		JdbcPersistentEntityImpl<?> fooE = context.getPersistentEntity(Foo.class);
-		
+		System.out.println(fooE);
 //		fooE.getPersistentProperty(annotationType)
 		
 //		JdbcPersistentProperty idProperty = fooE.getIdProperty();

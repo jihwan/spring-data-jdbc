@@ -9,6 +9,8 @@ import lombok.Data;
 @Data @Embeddable
 public class Bar implements Serializable {
 
+	private static final long serialVersionUID = 1504236273862949567L;
+	
 	String a;
 	String b;
 	

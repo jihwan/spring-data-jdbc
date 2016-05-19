@@ -22,7 +22,9 @@ import org.springframework.data.repository.config.AnnotationRepositoryConfigurat
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-class JdbcMappingContextFactoryBean extends AbstractFactoryBean<JdbcMappingContext> implements ApplicationContextAware, ResourceLoaderAware {
+class JdbcMappingContextFactoryBean 
+	extends AbstractFactoryBean<JdbcMappingContext> 
+	implements ApplicationContextAware, ResourceLoaderAware {
 
 	GenericApplicationContext applicationContext;
 	
@@ -37,7 +39,7 @@ class JdbcMappingContextFactoryBean extends AbstractFactoryBean<JdbcMappingConte
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
-
+	
 	@Override
 	public Class<?> getObjectType() {
 		return JdbcMappingContext.class;
@@ -46,8 +48,9 @@ class JdbcMappingContextFactoryBean extends AbstractFactoryBean<JdbcMappingConte
 	@Override
 	protected JdbcMappingContext createInstance() throws Exception {
 		
-		JdbcMappingContext jdbcMappingContext = new JdbcMappingContext();
 		Set<Class<?>> initialEntitySet = getInitialEntitySet();
+		
+		JdbcMappingContext jdbcMappingContext = new JdbcMappingContext(initialEntitySet);
 		jdbcMappingContext.setInitialEntitySet(initialEntitySet);
 		jdbcMappingContext.initialize();
 		

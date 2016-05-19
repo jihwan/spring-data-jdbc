@@ -23,5 +23,4 @@ public class H2JavaConfigTest {
 		assertNotNull(context);
 		BeanDefinitionUtils.printBeanDefinitions(context);
 	}
-
 }

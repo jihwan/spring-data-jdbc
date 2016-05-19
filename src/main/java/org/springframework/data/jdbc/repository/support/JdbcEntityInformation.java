@@ -12,8 +12,6 @@ public interface JdbcEntityInformation<T, ID extends Serializable> extends Entit
 	
 	JdbcMappingContext getJdbcMappingContext();
 	
-	void entity2Map(T entity);
-	
 //	/**
 //	 * Returns the id attribute of the entity.
 //	 * 

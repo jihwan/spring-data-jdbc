@@ -43,4 +43,8 @@ public class JdbcQueryMethod extends QueryMethod {
 //
 //		return targetType.cast(AnnotationUtils.getValue(annotation, attribute));
 	}
+
+	public boolean isProcedureQuery() {
+		return false;
+	}
 }

@@ -16,18 +16,14 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
-import org.springframework.data.mapping.model.FieldNamingStrategy;
-import org.springframework.data.mapping.model.PropertyNameFieldNamingStrategy;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
-import org.springframework.data.util.ClassTypeInformation;
-import org.springframework.data.util.TypeInformation;
-import org.springframework.util.StringUtils;
 
-public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentProperty<JdbcPersistentProperty> implements JdbcPersistentProperty {
+public class JdbcPersistentPropertyImpl 
+	extends AnnotationBasedPersistentProperty<JdbcPersistentProperty> 
+	implements JdbcPersistentProperty {
 
 	private static final Collection<Class<? extends Annotation>> ASSOCIATION_ANNOTATIONS;
 	private static final Collection<Class<? extends Annotation>> ID_ANNOTATIONS;
@@ -57,25 +53,37 @@ public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentPropert
 //		UPDATEABLE_ANNOTATIONS = Collections.unmodifiableSet(annotations);
 	}
 	
-	private final TypeInformation<?> associationTargetType;
+//	private final TypeInformation<?> associationTargetType;
 	
 	public JdbcPersistentPropertyImpl(Field field, PropertyDescriptor propertyDescriptor,
 			PersistentEntity<?, JdbcPersistentProperty> owner, SimpleTypeHolder simpleTypeHolder) {
 		super(field, propertyDescriptor, owner, simpleTypeHolder);
 		
-		this.associationTargetType = isAssociation() ? detectAssociationTargetType() : null;
+//		this.associationTargetType = isAssociation() ? detectAssociationTargetType() : null;
+	}
+	
+	private String ownerFieldName;
+	
+	@Override
+	public String getOwnerFieldName() {
+		return ownerFieldName;
 	}
 	
 	@Override
-	public Class<?> getActualType() {
-		return associationTargetType == null ? super.getActualType() : associationTargetType.getType();
+	public void setOwnerFieldName(String ownerFieldName) {
+		this.ownerFieldName = ownerFieldName;
 	}
 	
-	@Override
-	public Iterable<? extends TypeInformation<?>> getPersistentEntityType() {
-		return associationTargetType == null ? super.getPersistentEntityType() : Collections
-				.singleton(associationTargetType);
-	}
+//	@Override
+//	public Class<?> getActualType() {
+//		return associationTargetType == null ? super.getActualType() : associationTargetType.getType();
+//	}
+	
+//	@Override
+//	public Iterable<? extends TypeInformation<?>> getPersistentEntityType() {
+//		return associationTargetType == null ? super.getPersistentEntityType() : Collections
+//				.singleton(associationTargetType);
+//	}
 
 	@Override
 	protected Association<JdbcPersistentProperty> createAssociation() {
@@ -94,12 +102,6 @@ public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentPropert
 			return true;
 		}
 		
-//		// annotation 없이, pojo 정의 시...
-//		// 이 코드는 상황을 봐서 지우야 할 수도 있다!
-//		if (isEntity()) {
-//			return true;
-//		}
-
 		return false;
 	}
 	
@@ -143,58 +145,34 @@ public class JdbcPersistentPropertyImpl extends AnnotationBasedPersistentPropert
 		// 일반 field일 경우에도 Column 취급 한다.
 		return true;
 	}
+
+
 	
-	@Override
-	public boolean isOwnerEntity() {
-		
-		
-		if (getOwner() != null) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	
-	private TypeInformation<?> detectAssociationTargetType() {
+//	private TypeInformation<?> detectAssociationTargetType() {
+//
+//		for (Class<? extends Annotation> associationAnnotation : ASSOCIATION_ANNOTATIONS) {
+//
+//			Annotation annotation = findAnnotation(associationAnnotation);
+//			Object targetEntity = AnnotationUtils.getValue(annotation, "targetEntity");
+//
+//			if (targetEntity != null && !void.class.equals(targetEntity)) {
+//				return ClassTypeInformation.from((Class<?>) targetEntity);
+//			}
+//		}
+//
+//		return null;
+//	}
 
-		for (Class<? extends Annotation> associationAnnotation : ASSOCIATION_ANNOTATIONS) {
-
-			Annotation annotation = findAnnotation(associationAnnotation);
-			Object targetEntity = AnnotationUtils.getValue(annotation, "targetEntity");
-
-			if (targetEntity != null && !void.class.equals(targetEntity)) {
-				return ClassTypeInformation.from((Class<?>) targetEntity);
-			}
-		}
-
-		return null;
-	}
-
-	String ownerFieldName;
-	
-	@Override
-	public void setOwnerFieldName(String name) {
-		this.ownerFieldName = name;
-	}
-
-	@Override
-	public String getOwnerFieldName() {
-//		return this.ownerFieldName;
-		return getFieldName();
-	}
-	
-	
-	public String getFieldName() {
-		
-		FieldNamingStrategy fieldNamingStrategy = PropertyNameFieldNamingStrategy.INSTANCE;
-
-		String fieldName = fieldNamingStrategy.getFieldName(this);
-
-		if (!StringUtils.hasText(fieldName)) {
-			throw new RuntimeException("ddddddddddddddddd");
-		}
-
-		return fieldName;
-	}
+//	public String getFieldName() {
+//		
+//		FieldNamingStrategy fieldNamingStrategy = PropertyNameFieldNamingStrategy.INSTANCE;
+//
+//		String fieldName = fieldNamingStrategy.getFieldName(this);
+//
+//		if (!StringUtils.hasText(fieldName)) {
+//			throw new RuntimeException("ddddddddddddddddd");
+//		}
+//
+//		return fieldName;
+//	}
 }

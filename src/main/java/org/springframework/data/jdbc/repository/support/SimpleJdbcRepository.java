@@ -6,16 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.repository.JdbcRepository;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.util.Assert;
 
 /**
  * 
- * {@link JdbcTemplate}, RowMapper, RowUnMapper, JdbcEntityInformation, SqlDialect 등을 만들어야 한다.
- * 
- * @author zhwan
+ * @author Jihwan Hwang
  *
  * @param <T>
  * @param <ID>
@@ -26,16 +22,17 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 	final JdbcTemplate jdbcTemplate;
 	final BeanPropertyMapper<T> beanPropertyMapper;
 	
+	@SuppressWarnings("unchecked")
 	public SimpleJdbcRepository(JdbcEntityInformation<T, ?> entityInformation, JdbcTemplate jdbcTemplate) {
 
 		Assert.notNull(entityInformation);
 		Assert.notNull(jdbcTemplate);
 		
-		
 		this.entityInformation = entityInformation;
 		this.jdbcTemplate = jdbcTemplate;
-		this.beanPropertyMapper = 
-				JdbcBeanPropertyMapper.newInstance(entityInformation.getJavaType(), entityInformation.getJdbcMappingContext());
+		this.beanPropertyMapper = (BeanPropertyMapper<T>) 
+				JdbcBeanPropertyMapperFactory.jdbcBeanPropertyMapper(
+						entityInformation.getJavaType(), entityInformation.getJdbcMappingContext());
 	}
 	
 	@Override

@@ -7,26 +7,26 @@ import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.data.repository.query.ResultProcessor;
-import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
  * 
  * RowMapper, RowUnMapper, JdbcDialect 등을 인자로 받아야 하겠다!!!
  * 
- * @author zhwan
+ * @author Jihwan Hwang
  *
  */
 public abstract class AbstractJdbcQuery implements RepositoryQuery {
 
 	protected final JdbcQueryMethod method;
-	protected final JdbcOperations jdbcOperations;
+	protected final JdbcTemplate jdbcTemplate;
 	protected final JdbcMappingContext jdbcMapping;
 	
-	public AbstractJdbcQuery(JdbcQueryMethod method, JdbcOperations jdbcOperations, JdbcMappingContext jdbcMapping) {
+	public AbstractJdbcQuery(JdbcQueryMethod method, JdbcTemplate jdbcTemplate, JdbcMappingContext jdbcMapping) {
 		Assert.notNull(method);
 		this.method = method;
-		this.jdbcOperations = jdbcOperations;
+		this.jdbcTemplate = jdbcTemplate;
 		this.jdbcMapping = jdbcMapping;
 	}
 	
@@ -35,20 +35,12 @@ public abstract class AbstractJdbcQuery implements RepositoryQuery {
 		return doExecute(getExecution(), parameters);
 	}
 	
-	/**
-	 * @param execution
-	 * @param values
-	 * @return
-	 */
 	private Object doExecute(JdbcQueryExecution execution, Object[] values) {
 
 		ParametersParameterAccessor accessor = new ParametersParameterAccessor(method.getParameters(), values);
 		ResultProcessor processor = method.getResultProcessor().withDynamicProjection(accessor);
 		
-		
-		
 		Object result = execution.execute(this, values, processor.getReturnedType().getDomainType());
-
 		return result;
 	}
 
@@ -56,30 +48,28 @@ public abstract class AbstractJdbcQuery implements RepositoryQuery {
 
 	private JdbcQueryExecution getExecution() {
 		
-		if (method.isCollectionQuery()) {
+		if (method.isStreamQuery()) {
+			throw new UnsupportedOperationException("method.isStreamQuery() is not support");
+//			return new StreamExecution();
+		} else if (method.isProcedureQuery()) {
+			throw new UnsupportedOperationException("method.isProcedureQuery() is not support");
+//			return new ProcedureExecution();
+		} else if (method.isCollectionQuery()) {
 			return new CollectionExecution();
+		} else if (method.isSliceQuery()) {
+			throw new UnsupportedOperationException("method.isSliceQuery() is not support");
+//			return new SlicedExecution(method.getParameters());
+		} else if (method.isPageQuery()) {
+			throw new UnsupportedOperationException("method.isPageQuery() is not support");
+//			return new PagedExecution(method.getParameters());
+		} else if (method.isModifyingQuery()) {
+			throw new UnsupportedOperationException("method.isModifyingQuery() is not support");
+//			return method.getClearAutomatically() ? new ModifyingExecution(method, em) : new ModifyingExecution(method, null);
 		} else {
 			return new SingleEntityExecution();
 		}
-		
-//		if (method.isStreamQuery()) {
-//			return new StreamExecution();
-//		} else if (method.isProcedureQuery()) {
-//			return new ProcedureExecution();
-//		} else if (method.isCollectionQuery()) {
-//			return new CollectionExecution();
-//		} else if (method.isSliceQuery()) {
-//			return new SlicedExecution(method.getParameters());
-//		} else if (method.isPageQuery()) {
-//			return new PagedExecution(method.getParameters());
-//		} else if (method.isModifyingQuery()) {
-//			return method.getClearAutomatically() ? new ModifyingExecution(method, em) : new ModifyingExecution(method, null);
-//		} else {
-//			return new SingleEntityExecution();
-//		}
 	}
 	
-
 	@Override
 	public QueryMethod getQueryMethod() {
 		return this.method;
