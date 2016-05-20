@@ -7,13 +7,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-//import javax.persistence.EntityManagerFactory;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactoryBean;
-//import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.config.DefaultRepositoryBaseClass;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.QueryLookupStrategy.Key;
@@ -88,7 +86,6 @@ public @interface EnableJdbcRepositories {
 	 * @return
 	 */
 	Class<?> repositoryFactoryBeanClass() default JdbcRepositoryFactoryBean.class;
-//	Class<?> repositoryFactoryBeanClass() default JpaRepositoryFactoryBean.class;
 
 	/**
 	 * Configure the repository base class to be used to create repository proxies for this particular configuration.
@@ -97,16 +94,6 @@ public @interface EnableJdbcRepositories {
 	 * @since 1.9
 	 */
 	Class<?> repositoryBaseClass() default DefaultRepositoryBaseClass.class;
-
-	// JPA specific configuration
-
-//	/**
-//	 * Configures the name of the {@link EntityManagerFactory} bean definition to be used to create repositories
-//	 * discovered through this annotation. Defaults to {@code entityManagerFactory}.
-//	 * 
-//	 * @return
-//	 */
-//	String entityManagerFactoryRef() default "entityManagerFactory";
 
 	/**
 	 * Configures the name of the {@link PlatformTransactionManager} bean definition to be used to create repositories
