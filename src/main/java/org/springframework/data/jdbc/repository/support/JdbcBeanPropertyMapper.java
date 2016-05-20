@@ -162,55 +162,51 @@ class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 		
 		return instance;
 	}
-	
-//	@Override
-//	public T mapRow(ResultSet rs, int rowNum) throws SQLException {
-//		
-//		Assert.state(this.mappedClass != null, "Mapped class was not specified");
-//		T mappedObject = BeanUtils.instantiate(this.mappedClass);
-//		BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(mappedObject);
-//		
-//		ResultSetMetaData rsmd = rs.getMetaData();
-//		int columnCount = rsmd.getColumnCount();
-//		
-//		
-//		Map<Class<?>, BeanWrapper> assoMap = new HashMap<Class<?>, BeanWrapper>();
-//
-//		for (int index = 1; index <= columnCount; index++) {
-//			
-//			String column = JdbcUtils.lookupColumnName(rsmd, index);
-//			JdbcPersistentProperty jdbcPersistentProperty = this.mappedFields.get(column.toLowerCase());
-//			if(jdbcPersistentProperty == null) {
-//				continue;
-//			}
-//			
-//			Object columnValue = getColumnValue(rs, index, jdbcPersistentProperty);
-//			
-//			PersistentEntity<?, JdbcPersistentProperty> ownerEntity = jdbcPersistentProperty.getOwner();
-//			if (ownerEntity.getType() == getMappedClass()) {
-//				bw.setPropertyValue(jdbcPersistentProperty.getName(), columnValue);
-//			}
-//			else {
-//				BeanWrapper associationBw;
-//				if(assoMap.containsKey(ownerEntity.getType())) {
-//					associationBw = assoMap.get(ownerEntity.getType());
-//				}
-//				else {
-//					associationBw = PropertyAccessorFactory.forBeanPropertyAccess(BeanUtils.instantiate(ownerEntity.getType()));
-//					assoMap.put(ownerEntity.getType(), associationBw);
-//				}
-//				associationBw.setPropertyValue(jdbcPersistentProperty.getName(), columnValue);
-////				bw.setPropertyValue(jdbcPersistentProperty.getOwnerFieldName(), associationBw.getWrappedInstance());
-//			}
-//		}
-//		
-//		return mappedObject;
-//	}
 
 	@Override
-	public Map<String, Object> toMap(T entity) {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<String, Object> toMap(T entityObject) {
+		
+		Assert.notNull(entityObject);
+
+		JdbcPersistentEntity<?> entity = jdbcMappingContext.getPersistentEntity(entityObject.getClass());
+		if (entity == null) {
+			throw new MappingException("No mapping metadata found for " + mappedClass.getName());
+		}
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		return write(entity, entityObject, map);
+	}
+	
+	protected Map<String, Object> write(final JdbcPersistentEntity<?> entity, final Object entityObject, final Map<String, Object> map) {
+		
+		final PersistentPropertyAccessor accessor = 
+				new ConvertingPropertyAccessor(entity.getPropertyAccessor(entityObject), conversionService);
+		
+		entity.doWithProperties(new PropertyHandler<JdbcPersistentProperty>() {
+			@Override
+			public void doWithPersistentProperty(JdbcPersistentProperty persistentProperty) {
+				
+				Object value = accessor.getProperty(persistentProperty);
+				if(value != null) {
+					map.put(persistentProperty.getName(), value);
+				}
+			}
+		});
+		
+		entity.doWithAssociations(new AssociationHandler<JdbcPersistentProperty>() {
+			@Override
+			public void doWithAssociation(Association<JdbcPersistentProperty> association) {
+				
+				JdbcPersistentProperty property = association.getInverse();
+				Object innerObject = accessor.getProperty(property);
+				if (innerObject != null) {
+					JdbcPersistentEntity<?> acturalEntity = jdbcMappingContext.getPersistentEntity(property.getActualType());
+					write(acturalEntity, innerObject, map);
+				}
+			}
+		});
+		
+		return map;
 	}
 	
 	protected Object getColumnValue(ResultSet rs, int index, JdbcPersistentProperty entity) throws SQLException {
