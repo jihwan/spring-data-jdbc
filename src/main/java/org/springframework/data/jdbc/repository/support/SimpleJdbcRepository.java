@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
@@ -19,20 +20,25 @@ import org.springframework.util.Assert;
 public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRepository<T, ID> {
 	
 	final JdbcEntityInformation<T, ?> entityInformation;
+	final JdbcMappingContext jdbcMappingContext;
 	final JdbcTemplate jdbcTemplate;
+	
 	final BeanPropertyMapper<T> beanPropertyMapper;
 	
 	@SuppressWarnings("unchecked")
-	public SimpleJdbcRepository(JdbcEntityInformation<T, ?> entityInformation, JdbcTemplate jdbcTemplate) {
+	public SimpleJdbcRepository(JdbcEntityInformation<T, ?> entityInformation, JdbcMappingContext jdbcMappingContext, JdbcTemplate jdbcTemplate) {
 
 		Assert.notNull(entityInformation);
+		Assert.notNull(jdbcMappingContext);
 		Assert.notNull(jdbcTemplate);
 		
 		this.entityInformation = entityInformation;
+		this.jdbcMappingContext = jdbcMappingContext;
 		this.jdbcTemplate = jdbcTemplate;
+		
 		this.beanPropertyMapper = (BeanPropertyMapper<T>) 
 				JdbcBeanPropertyMapperFactory.jdbcBeanPropertyMapper(
-						entityInformation.getJavaType(), entityInformation.getJdbcMappingContext());
+						entityInformation.getJavaType(), jdbcMappingContext);
 	}
 	
 	@Override

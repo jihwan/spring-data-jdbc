@@ -38,7 +38,7 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 	private SimpleJdbcRepository<?, ?> doGetTargetRepository(RepositoryInformation information) {
 		
 		JdbcEntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
-		return getTargetRepositoryViaReflection(information, entityInformation, jdbcTemplate);
+		return getTargetRepositoryViaReflection(information, entityInformation, jdbcMappingContext, jdbcTemplate);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -47,7 +47,7 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 
 		if(JdbcPersistable.class.isAssignableFrom(domainClass)) {
 			JdbcPersistentEntityImpl<?> entity = jdbcMappingContext.getPersistentEntity(domainClass);
-			return new JdbcPersistableEntityInformation(entity, jdbcMappingContext);
+			return new JdbcPersistableEntityInformation(entity);
 		} else {
 			throw new IllegalStateException(domainClass + " must implementation JdbcPersistable interface");
 		}

@@ -3,7 +3,6 @@ package org.springframework.data.jdbc.repository.support;
 import java.io.Serializable;
 
 import org.springframework.data.jdbc.domain.JdbcPersistable;
-import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
 import org.springframework.data.repository.core.support.PersistentEntityInformation;
 
@@ -12,17 +11,10 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 	implements JdbcEntityInformation<T, ID> {
 	
 	JdbcPersistentEntity<T> persistentEntity;
-	JdbcMappingContext jdbcMappingContext;
-	
-//	public JdbcPersistableEntityInformation(JdbcPersistentEntity<T> entity) {
-//		super(entity);
-//		this.persistentEntity = entity;
-//	}
-	
-	public JdbcPersistableEntityInformation(JdbcPersistentEntity<T> entity, JdbcMappingContext jdbcMappingContext) {
+
+	public JdbcPersistableEntityInformation(JdbcPersistentEntity<T> entity) {
 		super(entity);
 		this.persistentEntity = entity;
-		this.jdbcMappingContext = jdbcMappingContext;
 	}
 
 	@Override
@@ -35,10 +27,10 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 		return this.persistentEntity;
 	}
 	
-	@Override
-	public JdbcMappingContext getJdbcMappingContext() {
-		return this.jdbcMappingContext;
-	}
+//	@Override
+//	public JdbcMappingContext getJdbcMappingContext() {
+//		return this.jdbcMappingContext;
+//	}
 	
 //	@Override
 //	public SingularAttribute<? super T, ?> getIdAttribute() {
