@@ -1,15 +1,14 @@
 package org.springframework.data.jdbc.domain.sample;
 
-import javax.persistence.Embedded;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
-
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Persistent;
+import org.springframework.data.annotation.Reference;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.jdbc.domain.JdbcPersistable;
 
 import lombok.Data;
 
-@Entity
+@Persistent
 @Data
 public class Foo
 //	extends AbstractJdbcPersistable<Foo, Bar> {
@@ -17,7 +16,7 @@ public class Foo
 
 	private static final long serialVersionUID = 8631471766926473778L;
 
-	@Embedded
+	@Reference
 	Address addR;
 	
 	String name;
@@ -64,7 +63,7 @@ public class Foo
  */
 	transient boolean persisted;
 	
-	@EmbeddedId
+	@Id
 	Bar bar;
 	
 	public Foo(Bar bar) {

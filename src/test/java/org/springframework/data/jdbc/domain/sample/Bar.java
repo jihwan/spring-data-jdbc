@@ -2,11 +2,9 @@ package org.springframework.data.jdbc.domain.sample;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
-
 import lombok.Data;
 
-@Data @Embeddable
+@Data
 public class Bar implements Serializable {
 
 	private static final long serialVersionUID = 1504236273862949567L;
