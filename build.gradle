@@ -22,7 +22,7 @@ repositories {
 dependencies {
 	compile ('org.springframework:spring-jdbc:4.+')
 	compile ('org.springframework.data:spring-data-commons:1.+')
-	compile ('org.eclipse.persistence:javax.persistence:2+')
+//	compile ('org.eclipse.persistence:javax.persistence:2+')
 	
 
 	
