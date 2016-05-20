@@ -62,18 +62,6 @@ public class JdbcPersistentPropertyImpl
 //		this.associationTargetType = isAssociation() ? detectAssociationTargetType() : null;
 	}
 	
-	private String ownerFieldName;
-	
-	@Override
-	public String getOwnerFieldName() {
-		return ownerFieldName;
-	}
-	
-	@Override
-	public void setOwnerFieldName(String ownerFieldName) {
-		this.ownerFieldName = ownerFieldName;
-	}
-	
 //	@Override
 //	public Class<?> getActualType() {
 //		return associationTargetType == null ? super.getActualType() : associationTargetType.getType();
