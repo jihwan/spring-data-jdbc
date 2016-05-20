@@ -27,7 +27,7 @@ public class JdbcBeanPropertyMapperTest {
 		
 		context = new JdbcMappingContext(entitySet);
 		JdbcPersistentEntityImpl<?> persistentEntity = context.getPersistentEntity(fooClazz);
-		information = new JdbcPersistableEntityInformation(persistentEntity, context);
+		information = new JdbcPersistableEntityInformation(persistentEntity);
 	}
 	
 	@Test
