@@ -2,21 +2,19 @@ package org.springframework.data.jdbc.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
-
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Persistent;
+import org.springframework.data.annotation.Transient;
 import org.springframework.util.ClassUtils;
 
-@MappedSuperclass
+@Persistent
 public class AbstractJdbcPersistable<T, ID extends Serializable> implements JdbcPersistable<T, ID> {
 
 	private static final long serialVersionUID = 305416690924663579L;
 
 	transient boolean persisted = false;
 	
-	@Id @GeneratedValue ID id;
+	@Id ID id;
 	
 	@Override
 	public ID getId() {
@@ -74,5 +72,4 @@ public class AbstractJdbcPersistable<T, ID extends Serializable> implements Jdbc
 
 		return hashCode;
 	}
-
 }

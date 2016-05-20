@@ -3,9 +3,6 @@ package org.springframework.data.jdbc.repository.config;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -17,6 +14,9 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.filter.AssignableTypeFilter;
+import org.springframework.data.annotation.Persistent;
+import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
 import org.springframework.util.ClassUtils;
@@ -58,7 +58,7 @@ class JdbcMappingContextFactoryBean
 	}
 	
 	/**
-	 * Entity(Domain object)의 대상은 {@link Entity}, {@link Embeddable} 이다.
+	 * Candidate Entity(Domain object) : {@link Persistent} or {@link JdbcPersistable}
 	 * 
 	 * @return
 	 * @throws ClassNotFoundException
@@ -70,9 +70,8 @@ class JdbcMappingContextFactoryBean
 				false);
 		scanner.setEnvironment(applicationContext.getEnvironment());
 		scanner.setResourceLoader(this.resourceLoader);
-		scanner.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
-//		scanner.addIncludeFilter(new AnnotationTypeFilter(Embeddable.class));
-//		scanner.addIncludeFilter(new AnnotationTypeFilter(Persistent.class));
+		scanner.addIncludeFilter(new AssignableTypeFilter(JdbcPersistable.class));
+		scanner.addIncludeFilter(new AnnotationTypeFilter(Persistent.class));
 		for (String basePackage : getBasePackages()) {
 			if (StringUtils.hasText(basePackage)) {
 				for (BeanDefinition candidate : scanner
@@ -84,6 +83,7 @@ class JdbcMappingContextFactoryBean
 		}
 		return entitySet;
 	}
+	
 	
 	public Iterable<String> getBasePackages() {
 
