@@ -24,7 +24,6 @@ public class JdbcQueryMethod extends QueryMethod {
 		String query = getAnnotationValue("value", String.class);
 		return StringUtils.hasText(query) ? query : null;
 	}
-
 	
 	private <T> T getAnnotationValue(String attribute, Class<T> type) {
 		return getMergedOrDefaultAnnotationValue(attribute, Query.class, type);
@@ -33,15 +32,7 @@ public class JdbcQueryMethod extends QueryMethod {
 	private <T> T getMergedOrDefaultAnnotationValue(String attribute, Class<? extends Annotation> annotationType, Class<T> targetType) {
 
 		Annotation annotation = AnnotatedElementUtils.findMergedAnnotation(method, annotationType);
-		
 		return targetType.cast(AnnotationUtils.getValue(annotation, attribute));
-		
-//		
-//		if (annotation == null) {
-//			return targetType.cast(AnnotationUtils.getDefaultValue(annotationType, attribute));
-//		}
-//
-//		return targetType.cast(AnnotationUtils.getValue(annotation, attribute));
 	}
 
 	public boolean isProcedureQuery() {

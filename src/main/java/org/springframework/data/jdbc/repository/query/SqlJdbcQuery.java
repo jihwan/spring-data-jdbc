@@ -13,8 +13,6 @@ public class SqlJdbcQuery extends AbstractJdbcQuery {
 	protected Query createQuery() {
 		
 		String sql = method.getAnnotatedQuery();
-		
 		return new Query(sql);
 	}
-
 }
