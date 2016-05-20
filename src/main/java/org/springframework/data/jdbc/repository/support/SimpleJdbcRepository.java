@@ -1,6 +1,7 @@
 package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,11 +69,9 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 
 	public <S extends T> S insert(S entity) {
 		
+		Map<String, Object> map = this.beanPropertyMapper.toMap(entity);
+		System.err.println("Object2Map >>> " + map);
 		
-		
-		
-		
-//  		entityInformation.entity2Map(entity);
 		return entity;
 	}
 
