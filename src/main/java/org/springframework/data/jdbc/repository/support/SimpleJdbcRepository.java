@@ -1,6 +1,9 @@
 package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -60,17 +63,26 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 	
 	@Override
 	public Iterable<T> findAll(Iterable<ID> ids) {
-		return null;
+        List<ID> idsList = toList(ids);
+        if (idsList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return jdbcTemplate.query(
+        		sqlGenerator.selectByIds(information, idsList.size()), this.beanPropertyMapper, flatten(idsList));
 	}
 	
 	@Override
 	public T findOne(ID id) {
-		return null;
+		List<T> entityOrEmpty = jdbcTemplate.query(
+				sqlGenerator.selectById(information), this.beanPropertyMapper, information.getCompositeIdAttributeValue(id).toArray());
+		return entityOrEmpty.isEmpty() ? null : entityOrEmpty.get(0);
 	}
 	
 	@Override
 	public boolean exists(ID id) {
-		return false;
+		List<Integer> object = jdbcTemplate.queryForList(
+				sqlGenerator.existsById(information), information.getCompositeIdAttributeValue(id).toArray(), Integer.class);
+		return !object.isEmpty();
 	}
 
 	@Override
@@ -136,4 +148,68 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 	@Override
 	public void deleteAll() {
 	}
+	
+    @SuppressWarnings("hiding")
+	private <T>List<T> toList(Iterable<T> iterable) {
+
+        if (iterable instanceof List) {
+            return (List<T>) iterable;
+        }
+
+        List<T> result = new ArrayList<T>();
+        for (T item : iterable) {
+            result.add(item);
+        }
+
+        return result;
+    }
+    
+	private Object[] flatten(List<ID> ids) {
+        List<Object> result = new ArrayList<Object>();
+        for (ID id : ids) {
+            result.addAll(information.getCompositeIdAttributeValue(id));
+//            result.addAll(Arrays.asList(wrapToArray(id)));
+        }
+        return result.toArray();
+    }
+    
+//    /**
+//     * Wraps the given object into an object array. If the object is an object
+//     * array, then it returns it as-is. If it's an array of primitives, then
+//     * it converts it into an array of primitive wrapper objects.
+//     */
+//    private Object[] wrapToArray(Object obj) {
+//        if (obj == null) {
+//            return new Object[0];
+//        }
+//        if (obj instanceof Object[]) {
+//            return (Object[]) obj;
+//        }
+//        if (obj.getClass().isArray()) {
+//            return toObjectArray(obj);
+//        }
+//        return new Object[]{ obj };
+//    }
+//    
+//    private Object[] toObjectArray(Object source) {
+//		if (source instanceof Object[]) {
+//			return (Object[]) source;
+//		}
+//		if (source == null) {
+//			return new Object[0];
+//		}
+//		if (!source.getClass().isArray()) {
+//			throw new IllegalArgumentException("Source is not an array: " + source);
+//		}
+//		int length = Array.getLength(source);
+//		if (length == 0) {
+//			return new Object[0];
+//		}
+//		Class<?> wrapperType = Array.get(source, 0).getClass();
+//		Object[] newArray = (Object[]) Array.newInstance(wrapperType, length);
+//		for (int i = 0; i < length; i++) {
+//			newArray[i] = Array.get(source, i);
+//		}
+//		return newArray;
+//	}
 }
