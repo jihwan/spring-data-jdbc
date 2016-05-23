@@ -14,6 +14,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.data.jdbc.repository.JdbcRepository;
+import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactoryBean;
 import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
 import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
@@ -28,6 +29,8 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 	private static final String DEFAULT_TRANSACTION_MANAGER_BEAN_NAME = "transactionManager";
 	private static final String ENABLE_DEFAULT_TRANSACTIONS_ATTRIBUTE = "enableDefaultTransactions";
 
+	static final String JDBC_MAPPING_CONTEXT_BEAN_NAME = "jdbcMappingContext";
+	
 	// ================================= 변경
 	/* 
 	 * (non-Javadoc)
@@ -43,6 +46,7 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.config14.RepositoryConfigurationExtension#getRepositoryInterface()
 	 */
+	@Override
 	public String getRepositoryFactoryClassName() {
 		return JdbcRepositoryFactoryBean.class.getName();
 	}
@@ -88,13 +92,16 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 		String transactionManagerRef = source.getAttribute("transactionManagerRef");
 		builder.addPropertyValue("transactionManager",
 				transactionManagerRef == null ? DEFAULT_TRANSACTION_MANAGER_BEAN_NAME : transactionManagerRef);
-//		builder.addPropertyValue("entityManager", getEntityManagerBeanDefinitionFor(source, source.getSource()));
-		
-		
 		builder.addPropertyReference("mappingContext", JDBC_MAPPING_CONTEXT_BEAN_NAME);
+		
+		try {
+			builder.addPropertyValue("jdbcSqlDialect", Class.forName(source.getAttribute("jdbcSqlDialect")));
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(JdbcSqlDialect.class.getName() + " is not exist.", e);
+		}
 	}
 
-	String JDBC_MAPPING_CONTEXT_BEAN_NAME = "jdbcMappingContext";
+	
 	
 	/* 
 	 * (non-Javadoc)
@@ -129,7 +136,7 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 		super.registerBeansForRoot(registry, config);
 		Object source = config.getSource();
 				
-		registerIfNotAlreadyRegistered(new RootBeanDefinition(JdbcMappingContextFactoryBean.class), registry, JDBC_MAPPING_CONTEXT_BEAN_NAME, source);		
+		registerIfNotAlreadyRegistered(new RootBeanDefinition(JdbcMappingContextFactoryBean.class), registry, JDBC_MAPPING_CONTEXT_BEAN_NAME, source);
 	}
 	
 	

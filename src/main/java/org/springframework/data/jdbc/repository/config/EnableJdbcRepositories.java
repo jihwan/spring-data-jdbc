@@ -7,7 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Import;
@@ -23,6 +22,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Inherited
 @Import(JdbcRepositoriesRegistrar.class)
 public @interface EnableJdbcRepositories {
+	
+	String jdbcSqlDialect() default SqlDialect.SimpleJdbcSqlDialect;
 
 	/**
 	 * Alias for the {@link #basePackages()} attribute. Allows for more concise annotation declarations e.g.:
