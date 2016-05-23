@@ -7,6 +7,7 @@ import org.springframework.data.jdbc.repository.support.JdbcEntityInformation;
 /**
  * 
  * @author Tomasz Nurkiewicz 
+ * @author Jakub Jirutka 
  * @author Jihwan Hwang
  *
  */

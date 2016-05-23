@@ -8,9 +8,11 @@ import org.springframework.data.jdbc.repository.support.JdbcEntityInformation;
 
 /**
  * <a href="https://github.com/nurkiewicz/spring-data-jdbc-repository">original code</a>
+ * <a href="https://github.com/jirutka/spring-data-jdbc-repository">fork code</a>
  * 
  * 
  * @author Tomasz Nurkiewicz 
+ * @author Jakub Jirutka  
  * @author Jihwan Hwang
  *
  */
