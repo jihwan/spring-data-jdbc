@@ -87,7 +87,7 @@ class JdbcMappingContextFactoryBean
 	
 	public Iterable<String> getBasePackages() {
 
-		BeanDefinition beanDefinition = applicationContext.getBeanDefinition("jdbcMappingContext");
+		BeanDefinition beanDefinition = applicationContext.getBeanDefinition(JdbcRepositoryConfigExtension.JDBC_MAPPING_CONTEXT_BEAN_NAME);
 		Object source = beanDefinition.getSource();
 		StandardAnnotationMetadata metadata = (StandardAnnotationMetadata)source;
 		
