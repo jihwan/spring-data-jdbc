@@ -1,6 +1,7 @@
 package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
@@ -11,7 +12,7 @@ public interface JdbcEntityInformation<T, ID extends Serializable> extends Entit
 	
 	String getEntityName();
 	
-	Iterable<String> getIdAttributeNames();
+	List<String> getIdAttributeNames();
 	
 	Map<String, JdbcPersistentProperty> getMetaInfo();
 	
