@@ -1,5 +1,7 @@
 package org.springframework.data.jdbc.repository.config;
 
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
 //import java.lang.annotation.Annotation;
 //import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.data.annotation.Persistent;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactoryBean;
@@ -32,65 +35,34 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 
 	static final String JDBC_MAPPING_CONTEXT_BEAN_NAME = "jdbcMappingContext";
 	
-	// ================================= 변경
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getModuleName()
-	 */
 	@Override
 	public String getModuleName() {
-//		return "JPA";
 		return "JDBC";
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config14.RepositoryConfigurationExtension#getRepositoryInterface()
-	 */
 	@Override
 	public String getRepositoryFactoryClassName() {
 		return JdbcRepositoryFactoryBean.class.getName();
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config14.RepositoryConfigurationExtensionSupport#getModulePrefix()
-	 */
 	@Override
 	protected String getModulePrefix() {
 		return getModuleName().toLowerCase(Locale.US);
 	}
 
-	// ================================= 주석
-//	/* 
-//	 * (non-Javadoc)
-//	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getIdentifyingAnnotations()
-//	 */
-//	@Override
-//	protected Collection<Class<? extends Annotation>> getIdentifyingAnnotations() {
-//		return Arrays.asList(Entity.class, MappedSuperclass.class);
-//	}
+	@Override
+	protected Collection<Class<? extends Annotation>> getIdentifyingAnnotations() {
+		return Arrays.asList(Persistent.class);
+	}
 
-	// ================================= 변경
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getIdentifyingTypes()
-	 */
 	@Override
 	protected Collection<Class<?>> getIdentifyingTypes() {
-//		return Collections.<Class<?>> singleton(JpaRepository.class);
 		return Collections.<Class<?>> singleton(JdbcRepository.class);
 	}
 
-	// ================================= 주석 처리
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.RepositoryConfigurationSource)
-	 */
 	@Override
 	public void postProcess(BeanDefinitionBuilder builder, RepositoryConfigurationSource source) {
 		
-		// jdbcTemplateRef
 		String transactionManagerRef = source.getAttribute("transactionManagerRef");
 		builder.addPropertyValue("transactionManager",
 				transactionManagerRef == null ? DEFAULT_TRANSACTION_MANAGER_BEAN_NAME : transactionManagerRef);
@@ -107,12 +79,6 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 		}
 	}
 
-	
-	
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource)
-	 */
 	@Override
 	public void postProcess(BeanDefinitionBuilder builder, AnnotationRepositoryConfigurationSource config) {
 
@@ -122,10 +88,6 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 				attributes.getBoolean(ENABLE_DEFAULT_TRANSACTIONS_ATTRIBUTE));
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.XmlRepositoryConfigurationSource)
-	 */
 	@Override
 	public void postProcess(BeanDefinitionBuilder builder, XmlRepositoryConfigurationSource config) {
 

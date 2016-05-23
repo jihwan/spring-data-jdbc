@@ -14,6 +14,7 @@ import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactoryBea
 import org.springframework.data.repository.config.DefaultRepositoryBaseClass;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.QueryLookupStrategy.Key;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Target(ElementType.TYPE)
@@ -23,7 +24,20 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Import(JdbcRepositoriesRegistrar.class)
 public @interface EnableJdbcRepositories {
 	
+	// JDBC specific configuration
+	/**
+	 * 
+	 */
 	String jdbcSqlDialect() default SqlDialect.SimpleJdbcSqlDialect;
+	
+	// JDBC specific configuration
+	/**
+	 * Configures the name of the {@link JdbcTemplate} bean definition to be used to create repositories
+	 * discovered through this annotation. Defaults to {@code jdbcTemplate}.
+	 * 
+	 * @return
+	 */
+	String jdbcTemplateRef() default "jdbcTemplate";
 
 	/**
 	 * Alias for the {@link #basePackages()} attribute. Allows for more concise annotation declarations e.g.:
@@ -96,16 +110,6 @@ public @interface EnableJdbcRepositories {
 	 */
 	Class<?> repositoryBaseClass() default DefaultRepositoryBaseClass.class;
 	
-	// JDBC specific configuration
-
-	/**
-	 * Configures the name of the {@link EntityManagerFactory} bean definition to be used to create repositories
-	 * discovered through this annotation. Defaults to {@code entityManagerFactory}.
-	 * 
-	 * @return
-	 */
-	String jdbcTemplateRef() default "jdbcTemplate";
-
 	/**
 	 * Configures the name of the {@link PlatformTransactionManager} bean definition to be used to create repositories
 	 * discovered through this annotation. Defaults to {@code transactionManager}.
