@@ -6,8 +6,8 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.repository.JdbcRepository;
+import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
@@ -21,37 +21,59 @@ import org.springframework.util.Assert;
 public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRepository<T, ID> {
 	
 	final JdbcEntityInformation<T, ?> entityInformation;
-	final JdbcMappingContext jdbcMappingContext;
 	final JdbcTemplate jdbcTemplate;
+	final JdbcSqlDialect jdbcSqlDialect;
 	
 	final BeanPropertyMapper<T> beanPropertyMapper;
 	
-	@SuppressWarnings("unchecked")
-	public SimpleJdbcRepository(JdbcEntityInformation<T, ?> entityInformation, JdbcMappingContext jdbcMappingContext, JdbcTemplate jdbcTemplate) {
+	public SimpleJdbcRepository(JdbcEntityInformation<T, Serializable> entityInformation, JdbcTemplate jdbcTemplate, JdbcSqlDialect jdbcSqlDialect) {
 
 		Assert.notNull(entityInformation);
-		Assert.notNull(jdbcMappingContext);
 		Assert.notNull(jdbcTemplate);
+		Assert.notNull(jdbcSqlDialect);
 		
 		this.entityInformation = entityInformation;
-		this.jdbcMappingContext = jdbcMappingContext;
 		this.jdbcTemplate = jdbcTemplate;
+		this.jdbcSqlDialect = jdbcSqlDialect;
 		
-		this.beanPropertyMapper = (BeanPropertyMapper<T>) 
-				JdbcBeanPropertyMapperFactory.jdbcBeanPropertyMapper(
-						entityInformation.getJavaType(), jdbcMappingContext);
+		this.beanPropertyMapper = JdbcBeanPropertyMapper.newInstance(entityInformation);
+	}
+	
+	@Override
+	public Iterable<T> findAll() {
+		
+		String sql = jdbcSqlDialect.findAll(entityInformation);
+		return jdbcTemplate.query(sql, this.beanPropertyMapper);
 	}
 	
 	@Override
 	public Iterable<T> findAll(Sort sort) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Page<T> findAll(Pageable pageable) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public Iterable<T> findAll(Iterable<ID> ids) {
+		return null;
+	}
+	
+	@Override
+	public T findOne(ID id) {
+		return null;
+	}
+	
+	@Override
+	public boolean exists(ID id) {
+		return false;
+	}
+
+	@Override
+	public long count() {
+		return 0;
 	}
 
 	@Override
@@ -77,60 +99,27 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 
 	@Override
 	public <S extends T> Iterable<S> save(Iterable<S> entities) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public T findOne(ID id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean exists(ID id) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Iterable<T> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Iterable<T> findAll(Iterable<ID> ids) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public long count() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		for (S s : entities) {
+			save(s);
+		}
+		
+		return entities;
 	}
 
 	@Override
 	public void delete(ID id) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void delete(T entity) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void delete(Iterable<? extends T> entities) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void deleteAll() {
-		// TODO Auto-generated method stub
 	}
 }
