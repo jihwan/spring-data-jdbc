@@ -28,7 +28,6 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 	final BeanPropertyMapper<T> beanPropertyMapper;
 	
 	public SimpleJdbcRepository(JdbcEntityInformation<T, Serializable> entityInformation, JdbcTemplate jdbcTemplate, JdbcSqlDialect jdbcSqlDialect) {
-
 		Assert.notNull(entityInformation);
 		Assert.notNull(jdbcTemplate);
 		Assert.notNull(jdbcSqlDialect);
@@ -42,7 +41,6 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 	
 	@Override
 	public Iterable<T> findAll() {
-		
 		String sql = jdbcSqlDialect.findAll(information);
 		return jdbcTemplate.query(sql, this.beanPropertyMapper);
 	}
@@ -122,6 +120,10 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 
 	@Override
 	public void delete(Iterable<? extends T> entities) {
+		
+		for (T t : entities) {
+			delete(t);
+		}
 	}
 
 	@Override
