@@ -16,6 +16,7 @@ public class FooDaoImpl implements FooDaoCustom {
 	public Foo customMethod(Foo foo) {
 		
 		Assert.notNull(foo);
+		Assert.notNull(jdbc);
 		return foo;
 	}
 }
