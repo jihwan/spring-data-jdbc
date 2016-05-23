@@ -3,7 +3,8 @@ package org.springframework.data.jdbc.repository.support;
 import java.io.Serializable;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
 import org.springframework.data.mapping.context.MappingContext;
@@ -16,16 +17,12 @@ import org.springframework.util.Assert;
 public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable> extends
 		TransactionalRepositoryFactoryBeanSupport<T, S, ID> {
 	
-	JdbcTemplate jdbcTemplate;
+	private JdbcMappingContext jdbcMappingContext;
 	
-	JdbcMappingContext jdbcMappingContext;
+	private String jdbcTemplateName;
+	private Class<?> jdbcSqlDialectClazz;
 	
-	Class<?> jdbcSqlDialect;
-	
-	@Autowired
-	public void setJdbcOperations(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
+	private JdbcTemplate jdbcTemplate;
 	
 	@Override
 	public void setMappingContext(MappingContext<?, ?> mappingContext) {
@@ -33,8 +30,12 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 		this.jdbcMappingContext = JdbcMappingContext.class.cast(mappingContext);
 	}
 	
-	public void setJdbcSqlDialect(Class<?> jdbcSqlDialect) {
-		this.jdbcSqlDialect = jdbcSqlDialect;
+	public void setJdbcTemplate(String jdbcTemplateName) {
+		this.jdbcTemplateName = jdbcTemplateName;
+	}
+	
+	public void setJdbcSqlDialectClazz(Class<?> jdbcSqlDialect) {
+		this.jdbcSqlDialectClazz = jdbcSqlDialect;
 	}
 
 	@Override
@@ -55,12 +56,22 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	}
 	
 	protected JdbcSqlDialect createJdbcSqlDialect() {
-		return (JdbcSqlDialect) BeanUtils.instantiate(jdbcSqlDialect);
+		return (JdbcSqlDialect) BeanUtils.instantiate(jdbcSqlDialectClazz);
+	}
+	
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) {
+		super.setBeanFactory(beanFactory);
+		
+		ListableBeanFactory listableBeanFactory = (ListableBeanFactory) beanFactory;
+		this.jdbcTemplate = listableBeanFactory.getBean(this.jdbcTemplateName, JdbcTemplate.class);
+		Assert.notNull(jdbcTemplate);
 	}
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(jdbcTemplate, "JdbcTemplate must not be null");
+		Assert.hasText(jdbcTemplateName);
+		Assert.notNull(jdbcSqlDialectClazz);
 		super.afterPropertiesSet();
 	}
 }

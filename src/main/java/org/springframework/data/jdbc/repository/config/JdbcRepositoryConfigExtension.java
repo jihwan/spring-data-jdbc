@@ -27,6 +27,7 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 	// ================================= 주석 처리
 //	private static final Class<?> PAB_POST_PROCESSOR = PersistenceAnnotationBeanPostProcessor.class;
 	private static final String DEFAULT_TRANSACTION_MANAGER_BEAN_NAME = "transactionManager";
+	private static final String DEFAULT_JDBC_TEMPLATE_BEAN_NAME = "jdbcTemplate";
 	private static final String ENABLE_DEFAULT_TRANSACTIONS_ATTRIBUTE = "enableDefaultTransactions";
 
 	static final String JDBC_MAPPING_CONTEXT_BEAN_NAME = "jdbcMappingContext";
@@ -89,13 +90,18 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 	@Override
 	public void postProcess(BeanDefinitionBuilder builder, RepositoryConfigurationSource source) {
 		
+		// jdbcTemplateRef
 		String transactionManagerRef = source.getAttribute("transactionManagerRef");
 		builder.addPropertyValue("transactionManager",
 				transactionManagerRef == null ? DEFAULT_TRANSACTION_MANAGER_BEAN_NAME : transactionManagerRef);
 		builder.addPropertyReference("mappingContext", JDBC_MAPPING_CONTEXT_BEAN_NAME);
 		
+		
+		String jdbcTemplateRef = source.getAttribute("jdbcTemplateRef");
+		builder.addPropertyValue("jdbcTemplate",
+				jdbcTemplateRef == null ? DEFAULT_JDBC_TEMPLATE_BEAN_NAME : jdbcTemplateRef);
 		try {
-			builder.addPropertyValue("jdbcSqlDialect", Class.forName(source.getAttribute("jdbcSqlDialect")));
+			builder.addPropertyValue("jdbcSqlDialectClazz", Class.forName(source.getAttribute("jdbcSqlDialect")));
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(JdbcSqlDialect.class.getName() + " is not exist.", e);
 		}

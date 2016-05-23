@@ -95,6 +95,16 @@ public @interface EnableJdbcRepositories {
 	 * @since 1.9
 	 */
 	Class<?> repositoryBaseClass() default DefaultRepositoryBaseClass.class;
+	
+	// JDBC specific configuration
+
+	/**
+	 * Configures the name of the {@link EntityManagerFactory} bean definition to be used to create repositories
+	 * discovered through this annotation. Defaults to {@code entityManagerFactory}.
+	 * 
+	 * @return
+	 */
+	String jdbcTemplateRef() default "jdbcTemplate";
 
 	/**
 	 * Configures the name of the {@link PlatformTransactionManager} bean definition to be used to create repositories
