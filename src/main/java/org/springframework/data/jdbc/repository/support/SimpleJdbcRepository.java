@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +20,7 @@ import org.springframework.util.Assert;
  * @param <T>
  * @param <ID>
  */
-public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRepository<T, ID> {
+public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID extends Serializable> implements JdbcRepository<T, ID> {
 	
 	final JdbcEntityInformation<T, ?> information;
 	final JdbcTemplate jdbcTemplate;
@@ -91,12 +92,16 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 	public <S extends T> S insert(S entity) {
 		
 		Map<String, Object> map = this.beanPropertyMapper.toMap(entity);
+		
+		entity.persist(true);
 		return entity;
 	}
 	
 	public <S extends T> S update(S entity) {
 		
 		Map<String, Object> map = this.beanPropertyMapper.toMap(entity);
+		
+		entity.persist(true);
 		return entity;
 	}
 
@@ -116,6 +121,8 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 
 	@Override
 	public void delete(T entity) {
+		
+		entity.persist(false);
 	}
 
 	@Override
