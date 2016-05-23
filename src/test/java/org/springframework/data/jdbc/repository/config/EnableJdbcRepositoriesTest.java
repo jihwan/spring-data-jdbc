@@ -48,12 +48,12 @@ public class EnableJdbcRepositoriesTest {
 		
 		bar = new Bar("a", "b");
 		
+		address = new Address();
+		address.setStreet("street1");
+		
 		foo = new Foo(bar);
 		foo.setName("foo");
 		foo.setAddR(address);
-		
-		address = new Address();
-		address.setStreet("street1");
 	}
 	
 	@Test
@@ -61,8 +61,9 @@ public class EnableJdbcRepositoriesTest {
 		assertNotNull(context);
 		BeanDefinitionUtils.printBeanDefinitions(context);
 		
-//		fooDao.save(foo);
+		fooDao.save(foo);
 		jdbcTemplate.update("INSERT INTO foo (a, b, street, no, name) VALUES('bar_a', 'bar_b', 'addr_street', 123, 'foo_name')");
+		jdbcTemplate.update("INSERT INTO foo (a, b, street, no, name) VALUES('bar_a1', 'bar_b1', 'addr_street', 123, 'foo_name2')");
 		
 		for(Foo myFoo : fooDao.findByName("foo_name")) {
 			System.err.println(myFoo);
@@ -70,6 +71,11 @@ public class EnableJdbcRepositoriesTest {
 		
 		Foo customMethod = fooDao.customMethod(foo);
 		assertNotNull(customMethod);
+		
+		Iterable<Foo> findAll = fooDao.findAll();
+		for (Foo foo : findAll) {
+			System.err.println(foo);
+		}
 	}
 	
 	@Configuration
