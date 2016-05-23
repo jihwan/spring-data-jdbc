@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.support.GenericConversionService;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
 import org.springframework.data.jdbc.mapping.JdbcPersistentProperty;
@@ -35,23 +36,35 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 	protected static final Logger LOGGER = LoggerFactory.getLogger(JdbcBeanPropertyMapper.class);
 
 	protected GenericConversionService conversionService = new GenericConversionService();
-//	protected EntityInstantiators instantiators = new EntityInstantiators();
 	
 	protected JdbcEntityInformation<T, Serializable> information;
 	
+	public JdbcBeanPropertyMapper() {
+	}
+	
+	public JdbcBeanPropertyMapper(JdbcEntityInformation<T, Serializable> information) {
+		initialize(information);
+	}
 
 	public JdbcEntityInformation<T, Serializable> getInformation() {
 		return information;
 	}
 	
 	public void setInformation(JdbcEntityInformation<T, Serializable> information) {
-		this.information = information;
+		
+		if (this.information == null) {
+			initialize(information);
+		}
+		else {
+			if (this.information != information) {
+				throw new InvalidDataAccessApiUsageException("The mapped class can not be reassigned to map to " +
+						information + " since it is already providing mapping for " + this.information);
+			}
+		}
 	}
 	
-	
-	protected void initialize() {
-
-		Assert.notNull(information);
+	protected void initialize(JdbcEntityInformation<T, Serializable> information) {
+		this.information = information;
 	}
 	
 	public T mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -61,10 +74,22 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 			throw new MappingException("No mapping metadata found for " + information.getEntityName());
 		}
 		
-		ResultSetMetaData rsmd = rs.getMetaData();
-		int columnCount = rsmd.getColumnCount();
+		DBObject dbObject = extractResultSet(rs);
+		
+		T read = read(persistentEntity, dbObject);
+		
+		@SuppressWarnings("unchecked")
+		JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(read);
+		cast.persist(true);
+		return read;
+	}
+	
+	protected DBObject extractResultSet(final ResultSet rs) throws SQLException {
 		
 		DBObject dbObject = new DBObject();
+		
+		ResultSetMetaData rsmd = rs.getMetaData();
+		int columnCount = rsmd.getColumnCount();
 		
 		for (int index = 1; index <= columnCount; index++) {
 
@@ -78,11 +103,7 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 			dbObject.put(jdbcPersistentProperty.getField(), columnValue);
 		}
 		
-		T read = read(persistentEntity, dbObject);
-		@SuppressWarnings("unchecked")
-		JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(read);
-		cast.persist(true);
-		return read;
+		return dbObject;
 	}
 	
 	protected T read(final JdbcPersistentEntity<?> entity, final DBObject dbObject) {
@@ -167,9 +188,6 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 	}
 	
 	public static <T> JdbcBeanPropertyMapper<T> newInstance(JdbcEntityInformation<T, Serializable> information) {
-		JdbcBeanPropertyMapper<T> newInstance = new JdbcBeanPropertyMapper<T>();
-		newInstance.setInformation(information);
-		newInstance.initialize();
-		return newInstance;
+		return new JdbcBeanPropertyMapper<T>(information);
 	}
 }
