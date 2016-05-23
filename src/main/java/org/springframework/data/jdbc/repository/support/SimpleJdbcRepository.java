@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.repository.JdbcRepository;
@@ -20,7 +21,7 @@ import org.springframework.util.Assert;
  */
 public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRepository<T, ID> {
 	
-	final JdbcEntityInformation<T, ?> entityInformation;
+	final JdbcEntityInformation<T, ?> information;
 	final JdbcTemplate jdbcTemplate;
 	final JdbcSqlDialect jdbcSqlDialect;
 	
@@ -32,7 +33,7 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 		Assert.notNull(jdbcTemplate);
 		Assert.notNull(jdbcSqlDialect);
 		
-		this.entityInformation = entityInformation;
+		this.information = entityInformation;
 		this.jdbcTemplate = jdbcTemplate;
 		this.jdbcSqlDialect = jdbcSqlDialect;
 		
@@ -42,18 +43,20 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 	@Override
 	public Iterable<T> findAll() {
 		
-		String sql = jdbcSqlDialect.findAll(entityInformation);
+		String sql = jdbcSqlDialect.findAll(information);
 		return jdbcTemplate.query(sql, this.beanPropertyMapper);
 	}
 	
 	@Override
 	public Iterable<T> findAll(Sort sort) {
-		return null;
+		String sql = jdbcSqlDialect.findAll(information, sort);
+		return jdbcTemplate.query(sql, this.beanPropertyMapper);
 	}
 
 	@Override
 	public Page<T> findAll(Pageable pageable) {
-		return null;
+		String sql = jdbcSqlDialect.findAll(information, pageable);
+		return new PageImpl<T>(jdbcTemplate.query(sql, this.beanPropertyMapper), pageable, count());
 	}
 	
 	@Override
@@ -73,27 +76,29 @@ public class SimpleJdbcRepository<T, ID extends Serializable> implements JdbcRep
 
 	@Override
 	public long count() {
-		return 0;
+		return jdbcTemplate.queryForObject(jdbcSqlDialect.count(information), Long.class);
 	}
 
 	@Override
 	public <S extends T> S save(S entity) {
 		
-		if (entityInformation.isNew(entity)) {
-			System.err.println("isNew > " + entity);
+		if (information.isNew(entity)) {
 			return insert(entity);
 		}
 		else {
-			System.err.println("isNotNew > " + entity);
-			return entity;
+			return update(entity);
 		}
 	}
 
 	public <S extends T> S insert(S entity) {
 		
 		Map<String, Object> map = this.beanPropertyMapper.toMap(entity);
-		System.err.println("Object2Map >>> " + map);
+		return entity;
+	}
+	
+	public <S extends T> S update(S entity) {
 		
+		Map<String, Object> map = this.beanPropertyMapper.toMap(entity);
 		return entity;
 	}
 
