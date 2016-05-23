@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
@@ -13,7 +14,9 @@ import org.springframework.data.jdbc.mapping.JdbcPersistentEntityImpl;
 import org.springframework.data.jdbc.mapping.JdbcPersistentProperty;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
+import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PropertyHandler;
+import org.springframework.data.mapping.model.ConvertingPropertyAccessor;
 import org.springframework.data.repository.core.support.PersistentEntityInformation;
 
 public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Serializable>, ID extends Serializable> 
@@ -23,6 +26,8 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 	final JdbcPersistentEntity<T> persistentEntity;
 	final JdbcMappingContext jdbcMappingContext;
 	final MetaExtractor metaExtractor;
+	
+	protected GenericConversionService conversionService = new GenericConversionService();
 
 	public JdbcPersistableEntityInformation(JdbcPersistentEntity<T> entity, JdbcMappingContext jdbcMappingContext) {
 		super(entity);
@@ -62,6 +67,33 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 		return jdbcMappingContext.getPersistentEntity(clazz);
 	}
 	
+	@Override
+	public List<Object> getCompositeIdAttributeValue(Object id) {
+		
+		
+		JdbcPersistentEntity<?> pe = getPersistentEntity(id.getClass());
+		
+		final List<Object> ids = new ArrayList<Object>();
+		
+		final PersistentPropertyAccessor accessor = 
+				new ConvertingPropertyAccessor(pe.getPropertyAccessor(id), conversionService);
+		
+		pe.doWithProperties(new PropertyHandler<JdbcPersistentProperty>() {
+			@Override
+			public void doWithPersistentProperty(JdbcPersistentProperty persistentProperty) {
+				Object value = accessor.getProperty(persistentProperty);
+				ids.add(value);
+			}
+		});
+		
+		return ids;
+	}
+	
+//	@Override
+//	public Object[] getCompositeIdAttributeValue(Iterable<Serializable> ids) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 	
 	class MetaExtractor {
 		

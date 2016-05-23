@@ -31,7 +31,9 @@ public interface JdbcEntityInformation<T, ID extends Serializable> extends Entit
 	JdbcPersistentEntity<?> getPersistentEntity(Class<?> clazz);
 	
 	
+	List<Object> getCompositeIdAttributeValue(Object id);
 	
+//	Object[] getCompositeIdAttributeValue(Iterable<Serializable> ids);
 	
 //	JdbcPersistentEntity<T> getJdbcPersistentEntity();
 	
