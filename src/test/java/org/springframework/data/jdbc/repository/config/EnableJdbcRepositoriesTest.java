@@ -3,6 +3,7 @@ package org.springframework.data.jdbc.repository.config;
 import static org.junit.Assert.assertNotNull;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,8 @@ import org.springframework.data.jdbc.domain.sample2.FooDaoCustom;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.google.common.collect.Lists;
 
 import testconfig.H2JavaConfig;
 import util.BeanDefinitionUtils;
@@ -66,7 +69,7 @@ public class EnableJdbcRepositoriesTest {
 		jdbcTemplate.update("INSERT INTO foo (a, b, street, no, name) VALUES('bar_a1', 'bar_b1', 'addr_street', 123, 'foo_name2')");
 		
 		for(Foo myFoo : fooDao.findByName("foo_name")) {
-			System.err.println(myFoo);
+			System.err.println(myFoo + "\t" + myFoo.isPersisted());
 		}
 		
 		Foo customMethod = fooDao.customMethod(foo);
@@ -74,8 +77,23 @@ public class EnableJdbcRepositoriesTest {
 		
 		Iterable<Foo> findAll = fooDao.findAll();
 		for (Foo foo : findAll) {
-			System.err.println(foo);
+			System.err.println(foo + "\t" + foo.isPersisted());
 		}
+		
+		List<Bar> barIds = Lists.newArrayList(new Bar("bar_a", "bar_b"), new Bar("bar_a1", "bar_b1"));
+		findAll = fooDao.findAll(barIds);
+		for (Foo foo : findAll) {
+			System.err.println(foo + "\t" + foo.isPersisted());
+		}
+		
+		Foo findOne = fooDao.findOne(new Bar("bar_a", "bar_b"));
+		System.err.println("findOne >> " + findOne + "\t" + findOne.isPersisted());
+		
+		
+		boolean exists = fooDao.exists(new Bar("bar_a", "bar_b"));
+		System.err.println("exists>> " + exists);
+		
+		System.err.println(fooDao.count());
 	}
 	
 	@Configuration
