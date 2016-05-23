@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.repository.JdbcRepository;
-import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
+import org.springframework.data.jdbc.repository.sql.SqlGenerator;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
@@ -24,37 +24,37 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 	
 	final JdbcEntityInformation<T, ?> information;
 	final JdbcTemplate jdbcTemplate;
-	final JdbcSqlDialect jdbcSqlDialect;
+	final SqlGenerator sqlGenerator;
 	
 	final BeanPropertyMapper<T> beanPropertyMapper;
 	
-	public SimpleJdbcRepository(JdbcEntityInformation<T, Serializable> entityInformation, JdbcTemplate jdbcTemplate, JdbcSqlDialect jdbcSqlDialect) {
+	public SimpleJdbcRepository(JdbcEntityInformation<T, Serializable> entityInformation, JdbcTemplate jdbcTemplate, SqlGenerator sqlGenerator) {
 		Assert.notNull(entityInformation);
 		Assert.notNull(jdbcTemplate);
-		Assert.notNull(jdbcSqlDialect);
+		Assert.notNull(sqlGenerator);
 		
 		this.information = entityInformation;
 		this.jdbcTemplate = jdbcTemplate;
-		this.jdbcSqlDialect = jdbcSqlDialect;
+		this.sqlGenerator = sqlGenerator;
 		
 		this.beanPropertyMapper = JdbcBeanPropertyMapper.newInstance(entityInformation);
 	}
 	
 	@Override
 	public Iterable<T> findAll() {
-		String sql = jdbcSqlDialect.findAll(information);
+		String sql = sqlGenerator.selectAll(information);
 		return jdbcTemplate.query(sql, this.beanPropertyMapper);
 	}
 	
 	@Override
 	public Iterable<T> findAll(Sort sort) {
-		String sql = jdbcSqlDialect.findAll(information, sort);
+		String sql = sqlGenerator.selectAll(information, sort);
 		return jdbcTemplate.query(sql, this.beanPropertyMapper);
 	}
 
 	@Override
 	public Page<T> findAll(Pageable pageable) {
-		String sql = jdbcSqlDialect.findAll(information, pageable);
+		String sql = sqlGenerator.selectAll(information, pageable);
 		return new PageImpl<T>(jdbcTemplate.query(sql, this.beanPropertyMapper), pageable, count());
 	}
 	
@@ -75,7 +75,7 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 
 	@Override
 	public long count() {
-		return jdbcTemplate.queryForObject(jdbcSqlDialect.count(information), Long.class);
+		return jdbcTemplate.queryForObject(sqlGenerator.count(information), Long.class);
 	}
 
 	@Override

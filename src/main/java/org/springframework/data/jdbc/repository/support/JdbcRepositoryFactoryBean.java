@@ -2,11 +2,11 @@ package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
-import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
+import org.springframework.data.jdbc.repository.sql.SqlGenerator;
+import org.springframework.data.jdbc.repository.sql.SqlGeneratorResolver;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
@@ -20,7 +20,7 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	private JdbcMappingContext jdbcMappingContext;
 	
 	private String jdbcTemplateName;
-	private Class<?> jdbcSqlDialectClazz;
+//	private Class<?> jdbcSqlDialectClazz;
 	
 	private JdbcTemplate jdbcTemplate;
 	
@@ -34,30 +34,43 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 		this.jdbcTemplateName = jdbcTemplateName;
 	}
 	
-	public void setJdbcSqlDialectClazz(Class<?> jdbcSqlDialect) {
-		this.jdbcSqlDialectClazz = jdbcSqlDialect;
-	}
+//	public void setJdbcSqlDialectClazz(Class<?> jdbcSqlDialect) {
+//		this.jdbcSqlDialectClazz = jdbcSqlDialect;
+//	}
 
 	@Override
 	protected RepositoryFactorySupport doCreateRepositoryFactory() {
 		return createRepositoryFactory(jdbcTemplate);
 	}
-
-	/**
-	 * Returns a {@link RepositoryFactorySupport}.
-	 * 
-	 * @param jdbcTemplate
-	 * @return
-	 */
+	
 	protected RepositoryFactorySupport createRepositoryFactory(JdbcTemplate jdbcTemplate) {
-		
-		JdbcSqlDialect jdbcSqlDialect = createJdbcSqlDialect();
-		return new JdbcRepositoryFactory(jdbcTemplate, jdbcMappingContext, jdbcSqlDialect);
+
+		SqlGenerator sqlGenerator = createSqlGenerator(jdbcTemplate);
+		return new JdbcRepositoryFactory(jdbcTemplate, jdbcMappingContext, sqlGenerator);
 	}
 	
-	protected JdbcSqlDialect createJdbcSqlDialect() {
-		return (JdbcSqlDialect) BeanUtils.instantiate(jdbcSqlDialectClazz);
+	protected SqlGenerator createSqlGenerator(JdbcTemplate jdbcTemplate) {
+		
+		SqlGenerator resolveSqlGenerator = 
+				new SqlGeneratorResolver().resolveSqlGenerator(jdbcTemplate.getDataSource());
+		return resolveSqlGenerator;
 	}
+
+//	/**
+//	 * Returns a {@link RepositoryFactorySupport}.
+//	 * 
+//	 * @param jdbcTemplate
+//	 * @return
+//	 */
+//	protected RepositoryFactorySupport createRepositoryFactory(JdbcTemplate jdbcTemplate) {
+//		
+//		JdbcSqlDialect jdbcSqlDialect = createJdbcSqlDialect();
+//		return new JdbcRepositoryFactory(jdbcTemplate, jdbcMappingContext, jdbcSqlDialect);
+//	}
+//	
+//	protected JdbcSqlDialect createJdbcSqlDialect() {
+//		return (JdbcSqlDialect) BeanUtils.instantiate(jdbcSqlDialectClazz);
+//	}
 	
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
@@ -71,7 +84,7 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	@Override
 	public void afterPropertiesSet() {
 		Assert.hasText(jdbcTemplateName);
-		Assert.notNull(jdbcSqlDialectClazz);
+//		Assert.notNull(jdbcSqlDialectClazz);
 		super.afterPropertiesSet();
 	}
 }

@@ -1,10 +1,10 @@
 package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
@@ -43,7 +43,7 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 	}
 
 	@Override
-	public Iterable<String> getIdAttributeNames() {
+	public List<String> getIdAttributeNames() {
 		return this.metaExtractor.getIdAttributeNames();
 	}
 	
@@ -66,13 +66,13 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 	class MetaExtractor {
 		
 		final Map<String, JdbcPersistentProperty> map = new HashMap<String, JdbcPersistentProperty>();
-		final Set<String> id = new HashSet<String>();
+		final List<String> id = new ArrayList<String>();
 		
 		MetaExtractor() {
 			execute();
 		}
 		
-		Iterable<String> getIdAttributeNames() {
+		List<String> getIdAttributeNames() {
 			return this.id;
 		}
 		

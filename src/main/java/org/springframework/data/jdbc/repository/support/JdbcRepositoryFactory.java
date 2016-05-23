@@ -6,7 +6,7 @@ import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntityImpl;
 import org.springframework.data.jdbc.repository.query.JdbcQueryLookupStrategy;
-import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
+import org.springframework.data.jdbc.repository.sql.SqlGenerator;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
@@ -20,14 +20,14 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final JdbcMappingContext jdbcMappingContext;
-	private final JdbcSqlDialect jdbcSqlDialect;
+	private final SqlGenerator sqlGenerator;
 	
-	public JdbcRepositoryFactory(JdbcTemplate jdbcTemplate, JdbcMappingContext jdbcMappingContext, JdbcSqlDialect jdbcSqlDialect) {
+	public JdbcRepositoryFactory(JdbcTemplate jdbcTemplate, JdbcMappingContext jdbcMappingContext, SqlGenerator sqlGenerator) {
 		Assert.notNull(jdbcTemplate);
 		Assert.notNull(jdbcMappingContext);
 		this.jdbcTemplate = jdbcTemplate;
 		this.jdbcMappingContext = jdbcMappingContext;
-		this.jdbcSqlDialect = jdbcSqlDialect;
+		this.sqlGenerator = sqlGenerator;
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 	private SimpleJdbcRepository<?, ?> doGetTargetRepository(RepositoryInformation information) {
 		
 		JdbcEntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
-		return getTargetRepositoryViaReflection(information, entityInformation, jdbcTemplate, jdbcSqlDialect);
+		return getTargetRepositoryViaReflection(information, entityInformation, jdbcTemplate, sqlGenerator);
 //		return getTargetRepositoryViaReflection(information, entityInformation, jdbcMappingContext, jdbcTemplate);
 	}
 	
