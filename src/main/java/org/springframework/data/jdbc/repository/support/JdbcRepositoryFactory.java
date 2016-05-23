@@ -6,6 +6,7 @@ import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntityImpl;
 import org.springframework.data.jdbc.repository.query.JdbcQueryLookupStrategy;
+import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
@@ -19,12 +20,14 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final JdbcMappingContext jdbcMappingContext;
+	private final JdbcSqlDialect jdbcSqlDialect;
 	
-	public JdbcRepositoryFactory(JdbcTemplate jdbcTemplate, JdbcMappingContext jdbcMappingContext) {
+	public JdbcRepositoryFactory(JdbcTemplate jdbcTemplate, JdbcMappingContext jdbcMappingContext, JdbcSqlDialect jdbcSqlDialect) {
 		Assert.notNull(jdbcTemplate);
 		Assert.notNull(jdbcMappingContext);
 		this.jdbcTemplate = jdbcTemplate;
 		this.jdbcMappingContext = jdbcMappingContext;
+		this.jdbcSqlDialect = jdbcSqlDialect;
 	}
 
 	@Override
@@ -38,16 +41,20 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 	private SimpleJdbcRepository<?, ?> doGetTargetRepository(RepositoryInformation information) {
 		
 		JdbcEntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
-		return getTargetRepositoryViaReflection(information, entityInformation, jdbcMappingContext, jdbcTemplate);
+		return getTargetRepositoryViaReflection(information, entityInformation, jdbcTemplate, jdbcSqlDialect);
+//		return getTargetRepositoryViaReflection(information, entityInformation, jdbcMappingContext, jdbcTemplate);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public <T, ID extends Serializable> JdbcEntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
-
+		
 		if(JdbcPersistable.class.isAssignableFrom(domainClass)) {
 			JdbcPersistentEntityImpl<?> entity = jdbcMappingContext.getPersistentEntity(domainClass);
-			return new JdbcPersistableEntityInformation(entity);
+			JdbcEntityInformation information = new JdbcPersistableEntityInformation(entity, jdbcMappingContext);
+			jdbcMappingContext.addEntityInformation(domainClass, information);
+			return information;
+//			return new JdbcPersistableEntityInformation(entity, jdbcMappingContext);
 		} else {
 			throw new IllegalStateException(domainClass + " must implementation JdbcPersistable interface");
 		}

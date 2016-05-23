@@ -2,9 +2,10 @@ package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
-
+import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
@@ -19,6 +20,8 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	
 	JdbcMappingContext jdbcMappingContext;
 	
+	Class<?> jdbcSqlDialect;
+	
 	@Autowired
 	public void setJdbcOperations(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -28,6 +31,10 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	public void setMappingContext(MappingContext<?, ?> mappingContext) {
 		super.setMappingContext(mappingContext);
 		this.jdbcMappingContext = JdbcMappingContext.class.cast(mappingContext);
+	}
+	
+	public void setJdbcSqlDialect(Class<?> jdbcSqlDialect) {
+		this.jdbcSqlDialect = jdbcSqlDialect;
 	}
 
 	@Override
@@ -42,7 +49,13 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	 * @return
 	 */
 	protected RepositoryFactorySupport createRepositoryFactory(JdbcTemplate jdbcTemplate) {
-		return new JdbcRepositoryFactory(jdbcTemplate, jdbcMappingContext);
+		
+		JdbcSqlDialect jdbcSqlDialect = createJdbcSqlDialect();
+		return new JdbcRepositoryFactory(jdbcTemplate, jdbcMappingContext, jdbcSqlDialect);
+	}
+	
+	protected JdbcSqlDialect createJdbcSqlDialect() {
+		return (JdbcSqlDialect) BeanUtils.instantiate(jdbcSqlDialect);
 	}
 
 	@Override

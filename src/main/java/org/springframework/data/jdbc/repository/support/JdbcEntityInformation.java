@@ -1,13 +1,38 @@
 package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
+import org.springframework.data.jdbc.mapping.JdbcPersistentProperty;
 import org.springframework.data.repository.core.EntityInformation;
 
 public interface JdbcEntityInformation<T, ID extends Serializable> extends EntityInformation<T, ID> {
-
-	JdbcPersistentEntity<T> getJdbcPersistentEntity();
+	
+	String getEntityName();
+	
+	Iterable<String> getIdAttributeNames();
+	
+	Map<String, JdbcPersistentProperty> getMetaInfo();
+	
+	/**
+	 * Root Entity 정보를 가져올때 사용
+	 * @return
+	 */
+	JdbcPersistentEntity<T> getPersistentEntity();
+	
+	/**
+	 * entity 내부 associate entity class 정보를 가져 올때 사용
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	JdbcPersistentEntity<?> getPersistentEntity(Class<?> clazz);
+	
+	
+	
+	
+//	JdbcPersistentEntity<T> getJdbcPersistentEntity();
 	
 //	/**
 //	 * Returns the id attribute of the entity.

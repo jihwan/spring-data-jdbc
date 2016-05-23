@@ -1,6 +1,6 @@
 package org.springframework.data.jdbc.repository.support;
 
-import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -11,10 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.support.GenericConversionService;
-import org.springframework.data.convert.EntityInstantiators;
-import org.springframework.data.jdbc.mapping.JdbcMappingContext;
+import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
-import org.springframework.data.jdbc.mapping.JdbcPersistentEntityImpl;
 import org.springframework.data.jdbc.mapping.JdbcPersistentProperty;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
@@ -25,91 +23,42 @@ import org.springframework.data.mapping.model.MappingException;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.Assert;
 
-class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
+/**
+ * 
+ * 
+ * @author Jihwan Hwang
+ *
+ * @param <T>
+ */
+public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 	
 	protected static final Logger LOGGER = LoggerFactory.getLogger(JdbcBeanPropertyMapper.class);
 
 	protected GenericConversionService conversionService = new GenericConversionService();
-	protected EntityInstantiators instantiators = new EntityInstantiators();
+//	protected EntityInstantiators instantiators = new EntityInstantiators();
 	
-	protected Class<T> mappedClass;
-	protected JdbcMappingContext jdbcMappingContext;
+	protected JdbcEntityInformation<T, Serializable> information;
 	
-	private Map<String, JdbcPersistentProperty> mappedFields;
-	
-	public JdbcBeanPropertyMapper() {}
-	
-	public Class<T> getMappedClass() {
-		return mappedClass;
-	}
 
-	public void setMappedClass(Class<T> mappedClass) {
-		this.mappedClass = mappedClass;
+	public JdbcEntityInformation<T, Serializable> getInformation() {
+		return information;
 	}
 	
-	public JdbcMappingContext getJdbcMappingContext() {
-		return jdbcMappingContext;
+	public void setInformation(JdbcEntityInformation<T, Serializable> information) {
+		this.information = information;
 	}
 	
-	public void setJdbcMappingContext(JdbcMappingContext jdbcMappingContext) {
-		this.jdbcMappingContext = jdbcMappingContext;
-	}
-	
-	public Map<String, JdbcPersistentProperty> getMappedFields() {
-		return mappedFields;
-	}
 	
 	protected void initialize() {
 
-		Assert.notNull(jdbcMappingContext);
-		Assert.notNull(mappedClass);
-		this.mappedFields = new HashMap<String, JdbcPersistentProperty>();
-		
-		JdbcPersistentEntityImpl<?> persistentEntity = jdbcMappingContext.getPersistentEntity(this.mappedClass);
-		resolvePersistentEntity(persistentEntity);
-	}
-	
-	protected void resolvePersistentEntity(JdbcPersistentEntityImpl<?> persistentEntity) {
-		
-		PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(persistentEntity.getType());
-		for (int i = 0; i < pds.length; i++) {
-			
-			PropertyDescriptor pd = pds[i];
-			JdbcPersistentProperty persistentProperty = 
-					persistentEntity.getPersistentProperty(pd.getName());
-			
-			if (pd.getWriteMethod() != null && persistentProperty != null) {
-				if (persistentProperty.isAssociation()) {
-					resolveAssociationProperty(persistentProperty);
-				}
-				else {
-					this.mappedFields.put(pd.getName().toLowerCase(), persistentProperty);
-				}
-			}
-		}
-	}
-	
-	protected void resolveAssociationProperty(JdbcPersistentProperty associationProperty) {
-		
-		JdbcPersistentEntity<?> persistentEntity = jdbcMappingContext.getPersistentEntity(associationProperty.getActualType());
-		PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(persistentEntity.getType());
-		for (int i = 0; i < pds.length; i++) {
-			PropertyDescriptor pd = pds[i];
-			
-			if (pd.getWriteMethod() != null && associationProperty != null) {
-				JdbcPersistentProperty persistentProperty = 
-						persistentEntity.getPersistentProperty(pd.getName());
-				this.mappedFields.put(pd.getName().toLowerCase(), persistentProperty);
-			}
-		}
+		Assert.notNull(information);
 	}
 	
 	public T mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-		@SuppressWarnings("unchecked")
-		JdbcPersistentEntity<T> persistentEntity = (JdbcPersistentEntity<T>) jdbcMappingContext.getPersistentEntity(mappedClass);
+		JdbcPersistentEntity<T> persistentEntity = (JdbcPersistentEntity<T>) information.getPersistentEntity();
 		if (persistentEntity == null) {
-			throw new MappingException("No mapping metadata found for " + mappedClass.getName());
+			throw new MappingException("No mapping metadata found for " + information.getEntityName());
 		}
 		
 		ResultSetMetaData rsmd = rs.getMetaData();
@@ -120,7 +69,7 @@ class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 		for (int index = 1; index <= columnCount; index++) {
 
 			String column = JdbcUtils.lookupColumnName(rsmd, index);
-			JdbcPersistentProperty jdbcPersistentProperty = this.mappedFields.get(column.toLowerCase());
+			JdbcPersistentProperty jdbcPersistentProperty = information.getMetaInfo().get(column.toLowerCase());
 			if(jdbcPersistentProperty == null) {
 				continue;
 			}
@@ -129,7 +78,11 @@ class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 			dbObject.put(jdbcPersistentProperty.getField(), columnValue);
 		}
 		
-		return read(persistentEntity, dbObject);
+		T read = read(persistentEntity, dbObject);
+		@SuppressWarnings("unchecked")
+		JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(read);
+		cast.persist(true);
+		return read;
 	}
 	
 	protected T read(final JdbcPersistentEntity<?> entity, final DBObject dbObject) {
@@ -154,7 +107,7 @@ class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 			public void doWithAssociation(Association<JdbcPersistentProperty> association) {
 				
 				JdbcPersistentProperty property = association.getInverse();
-				JdbcPersistentEntity<?> acturalEntity = jdbcMappingContext.getPersistentEntity(property.getActualType());
+				JdbcPersistentEntity<?> acturalEntity = information.getPersistentEntity(property.getActualType());
 				T object = read(acturalEntity, dbObject);
 				accessor.setProperty(property, object);
 			}
@@ -168,9 +121,9 @@ class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 		
 		Assert.notNull(entityObject);
 
-		JdbcPersistentEntity<?> entity = jdbcMappingContext.getPersistentEntity(entityObject.getClass());
+		JdbcPersistentEntity<?> entity = information.getPersistentEntity(entityObject.getClass());
 		if (entity == null) {
-			throw new MappingException("No mapping metadata found for " + mappedClass.getName());
+			throw new MappingException("No mapping metadata found for " + information.getEntityName());
 		}
 		
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -200,7 +153,7 @@ class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 				JdbcPersistentProperty property = association.getInverse();
 				Object innerObject = accessor.getProperty(property);
 				if (innerObject != null) {
-					JdbcPersistentEntity<?> acturalEntity = jdbcMappingContext.getPersistentEntity(property.getActualType());
+					JdbcPersistentEntity<?> acturalEntity = information.getPersistentEntity(property.getActualType());
 					write(acturalEntity, innerObject, map);
 				}
 			}
@@ -213,10 +166,9 @@ class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 		return JdbcUtils.getResultSetValue(rs, index, entity.getType());
 	}
 	
-	public static <T> JdbcBeanPropertyMapper<T> newInstance(Class<T> mappedClass, JdbcMappingContext jdbcMappingContext) {
+	public static <T> JdbcBeanPropertyMapper<T> newInstance(JdbcEntityInformation<T, Serializable> information) {
 		JdbcBeanPropertyMapper<T> newInstance = new JdbcBeanPropertyMapper<T>();
-		newInstance.setMappedClass(mappedClass);
-		newInstance.setJdbcMappingContext(jdbcMappingContext);
+		newInstance.setInformation(information);
 		newInstance.initialize();
 		return newInstance;
 	}
