@@ -55,25 +55,20 @@ public class SqlGeneratorResolver {
     	try {
     		metaData = dataSource.getConnection().getMetaData();
     	} catch (SQLException ex) {
-    		throw new DataAccessResourceFailureException(
-    				"Failed to retrieve database metadata", ex);
+    		throw new DataAccessResourceFailureException("Failed to retrieve database metadata", ex);
     	}
     	
     	for (Class<?> clazz : clazzs) {
-			
     		SqlGenerator sqlGenerator = (SqlGenerator) BeanUtils.instantiate(clazz);
     		try {
     			if (sqlGenerator.isCompatible(metaData)) {
-    				LOG.info("Using SQL Generator {} for dataSource {}",
-    						sqlGenerator.getClass().getName(), dataSource.getClass());
-    				
+    				LOG.info("Using SQL Generator {} for dataSource {}", sqlGenerator.getClass().getName(), dataSource.getClass());
     				return sqlGenerator;
     			}
     		} catch (SQLException ex) {
-    			LOG.warn("Exception occurred when invoking isCompatible() on {}",
-    					sqlGenerator.getClass().getSimpleName(), ex);
+    			LOG.warn("Exception occurred when invoking isCompatible() on {}", sqlGenerator.getClass().getSimpleName(), ex);
     		}
-		}
+    	}
 
         // This should not happen, because registry should always contain one
         // "default" generator that returns true for every DatabaseMetaData.
