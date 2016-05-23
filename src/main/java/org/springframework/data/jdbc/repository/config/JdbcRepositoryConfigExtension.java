@@ -17,7 +17,6 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.data.annotation.Persistent;
 import org.springframework.data.jdbc.repository.JdbcRepository;
-import org.springframework.data.jdbc.repository.query.JdbcSqlDialect;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactoryBean;
 import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
 import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
@@ -72,11 +71,6 @@ public class JdbcRepositoryConfigExtension extends RepositoryConfigurationExtens
 		String jdbcTemplateRef = source.getAttribute("jdbcTemplateRef");
 		builder.addPropertyValue("jdbcTemplate",
 				jdbcTemplateRef == null ? DEFAULT_JDBC_TEMPLATE_BEAN_NAME : jdbcTemplateRef);
-		try {
-			builder.addPropertyValue("jdbcSqlDialectClazz", Class.forName(source.getAttribute("jdbcSqlDialect")));
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(JdbcSqlDialect.class.getName() + " is not exist.", e);
-		}
 	}
 
 	@Override

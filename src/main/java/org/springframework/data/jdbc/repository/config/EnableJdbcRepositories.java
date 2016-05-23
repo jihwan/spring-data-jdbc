@@ -26,12 +26,6 @@ public @interface EnableJdbcRepositories {
 	
 	// JDBC specific configuration
 	/**
-	 * 
-	 */
-	String jdbcSqlDialect() default SqlDialect.SimpleJdbcSqlDialect;
-	
-	// JDBC specific configuration
-	/**
 	 * Configures the name of the {@link JdbcTemplate} bean definition to be used to create repositories
 	 * discovered through this annotation. Defaults to {@code jdbcTemplate}.
 	 * 
