@@ -25,15 +25,15 @@ public class SqlGeneratorResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(SqlGeneratorResolver.class);
 
-
-    private final List<Class<?>> clazzs = new ArrayList<Class<?>>();
-
+    private final List<Class<?>> clazzs;
 
     /**
      * @param registerDefault Whether to register default (built-in) generators.
      * @see #getInstance()
      */
     public SqlGeneratorResolver() {
+    	clazzs = new ArrayList<Class<?>>();
+ 
     	clazzs.add(LimitOffsetSqlGenerator.class);
     	clazzs.add(SQL2008SqlGenerator.class);
     	clazzs.add(Oracle9SqlGenerator.class);
