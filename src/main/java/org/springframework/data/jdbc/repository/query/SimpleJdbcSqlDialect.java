@@ -6,6 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.repository.support.JdbcEntityInformation;
 
+/**
+ * <a href="https://github.com/nurkiewicz/spring-data-jdbc-repository">original code</a>
+ * 
+ * 
+ * @author Tomasz Nurkiewicz 
+ * @author Jihwan Hwang
+ *
+ */
 public class SimpleJdbcSqlDialect implements JdbcSqlDialect {
 
 	@Override
@@ -22,19 +30,19 @@ public class SimpleJdbcSqlDialect implements JdbcSqlDialect {
 		if (sort == null) {
 			return "";
 		}
-		StringBuilder orderByClause = new StringBuilder();
-		orderByClause.append(" ORDER BY ");
+		StringBuilder orderBy = new StringBuilder();
+		orderBy.append(" ORDER BY ");
 		for(Iterator<Sort.Order> iterator = sort.iterator(); iterator.hasNext();) {
 			final Sort.Order order = iterator.next();
-			orderByClause.
+			orderBy.
 					append(order.getProperty()).
 					append(" ").
 					append(order.getDirection().toString());
 			if (iterator.hasNext()) {
-				orderByClause.append(", ");
+				orderBy.append(", ");
 			}
 		}
-		return orderByClause.toString();
+		return orderBy.toString();
 	}
 
 	@Override
@@ -57,6 +65,11 @@ public class SimpleJdbcSqlDialect implements JdbcSqlDialect {
 	public String findById() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public String count(JdbcEntityInformation<?, ?> information) {
+		return "SELECT COUNT(*) FROM " + information.getEntityName();
 	}
 
 }

@@ -4,6 +4,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.repository.support.JdbcEntityInformation;
 
+/**
+ * 
+ * @author Tomasz Nurkiewicz 
+ * @author Jihwan Hwang
+ *
+ */
 public interface JdbcSqlDialect {
 
 	String findAll(JdbcEntityInformation<?, ?> information);
@@ -12,5 +18,6 @@ public interface JdbcSqlDialect {
 	
 	String findAllByIds();
 	String findById();
+	String count(JdbcEntityInformation<?, ?> information);
 	
 }
