@@ -1,7 +1,9 @@
 package org.springframework.data.jdbc.repository.query;
 
-import org.springframework.data.jdbc.mapping.JdbcMappingContext;
-import org.springframework.data.jdbc.repository.support.JdbcBeanPropertyMapperFactory;
+import java.io.Serializable;
+
+import org.springframework.data.jdbc.repository.support.JdbcBeanPropertyMapper;
+import org.springframework.data.jdbc.repository.support.JdbcEntityInformation;
 import org.springframework.jdbc.core.JdbcOperations;
 
 abstract class JdbcQueryExecution {
@@ -14,11 +16,9 @@ abstract class JdbcQueryExecution {
 		public Object execute(AbstractJdbcQuery query, Object[] values, Class<?> domainClass) {
 			
 			JdbcOperations jdbcOperations = query.jdbcTemplate;
-			JdbcMappingContext jdbcMapping = query.jdbcMapping;
+			JdbcEntityInformation<?, Serializable> information = query.jdbcMapping.getEntityInformation(domainClass);
 			String sql = query.createQuery().getSql();
-			
-			return jdbcOperations.query(sql, values, 
-					JdbcBeanPropertyMapperFactory.jdbcBeanPropertyMapper(domainClass, jdbcMapping));
+			return jdbcOperations.query(sql, values, JdbcBeanPropertyMapper.newInstance(information));
 		}
 	}
 	
@@ -27,11 +27,11 @@ abstract class JdbcQueryExecution {
 		@Override
 		public Object execute(AbstractJdbcQuery query, Object[] values, Class<?> domainClass) {
 			JdbcOperations jdbcOperations = query.jdbcTemplate;
-			JdbcMappingContext jdbcMapping = query.jdbcMapping;
+			JdbcEntityInformation<?, Serializable> information = query.jdbcMapping.getEntityInformation(domainClass);
 			String sql = query.createQuery().getSql();
 			
 			return jdbcOperations.queryForObject(sql, values, 
-					JdbcBeanPropertyMapperFactory.jdbcBeanPropertyMapper(domainClass, jdbcMapping));
+					JdbcBeanPropertyMapper.newInstance(information));
 		}
 	}
 }
