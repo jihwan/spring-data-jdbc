@@ -16,6 +16,9 @@ public class JdbcMappingContext extends
 		AbstractMappingContext<JdbcPersistentEntityImpl<?>, JdbcPersistentProperty> {
 
 	/**
+	 * JdbcQueryExecution 에서 사용하는 용도이다.
+	 * 근데 이게 모양새가 그리 좋아 보이지 않는다.
+	 * 
 	 * root entity 정보를 관리한다.
 	 */
 	private Map<Class<?>, JdbcEntityInformation<?, Serializable>> map = new HashMap<Class<?>, JdbcEntityInformation<?, Serializable>>();
