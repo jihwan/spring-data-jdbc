@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import util.BeanDefinitionUtils;
 
@@ -21,6 +22,8 @@ public class H2JavaConfigTest {
 	@Test
 	public void testApplicationContext() throws Exception {
 		assertNotNull(context);
+		assertNotNull(context.getBean(PlatformTransactionManager.class));
+		
 		BeanDefinitionUtils.printBeanDefinitions(context);
 	}
 }
