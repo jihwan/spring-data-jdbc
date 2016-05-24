@@ -1,13 +1,14 @@
 package org.springframework.data.jdbc.mapping;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
+import static org.junit.Assert.*;
+
+import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.jdbc.domain.sample.Foo;
+import org.springframework.data.mapping.PreferredConstructor;
+import org.springframework.data.mapping.PreferredConstructor.Parameter;
 import org.springframework.data.util.ClassTypeInformation;
 
 public class JdbcPersistentEntityImplTest {
@@ -22,28 +23,10 @@ public class JdbcPersistentEntityImplTest {
 	@Test
 	public void test() {
 		
-		PropertyDescriptor propertyDescriptor = getPropertyDescriptor(Foo.class, "addr");
-		System.err.println(propertyDescriptor);
-	}
-
-	
-	
-	private static PropertyDescriptor getPropertyDescriptor(Class<?> type, String propertyName) {
-
-		try {
-
-			BeanInfo info = Introspector.getBeanInfo(type);
-
-			for (PropertyDescriptor descriptor : info.getPropertyDescriptors()) {
-				if (descriptor.getName().equals(propertyName)) {
-					return descriptor;
-				}
-			}
-
-			return null;
-
-		} catch (IntrospectionException e) {
-			return null;
-		}
+		assertEquals(Foo.class.getName(), fooEntity.getName());
+		
+		PreferredConstructor<Foo,JdbcPersistentProperty> persistenceConstructor = fooEntity.getPersistenceConstructor();
+		Iterator<Parameter<Object, JdbcPersistentProperty>> iterator = persistenceConstructor.getParameters().iterator();
+		assertEquals(false, iterator.hasNext());
 	}
 }
