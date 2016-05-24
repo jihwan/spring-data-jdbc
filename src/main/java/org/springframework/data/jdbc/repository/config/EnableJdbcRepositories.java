@@ -17,6 +17,12 @@ import org.springframework.data.repository.query.QueryLookupStrategy.Key;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+/**
+ * caution : scanning custom entity class by basePackages() or basePackageClasses()
+ * 
+ * @author Jihwan Hwang
+ *
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
