@@ -33,6 +33,8 @@ import org.springframework.util.Assert;
  */
 public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 	
+	private static final long serialVersionUID = 6964742323414307923L;
+
 	protected static final Logger LOGGER = LoggerFactory.getLogger(JdbcBeanPropertyMapper.class);
 
 	protected GenericConversionService conversionService = new GenericConversionService();
@@ -67,9 +69,10 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 		this.information = information;
 	}
 	
+	@Override
 	public T mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-		JdbcPersistentEntity<T> persistentEntity = (JdbcPersistentEntity<T>) information.getPersistentEntity();
+		JdbcPersistentEntity<T> persistentEntity = information.getRootPersistentEntity();
 		if (persistentEntity == null) {
 			throw new MappingException("No mapping metadata found for " + information.getEntityName());
 		}
@@ -86,21 +89,21 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 	
 	protected DBObject extractResultSet(final ResultSet rs) throws SQLException {
 		
-		DBObject dbObject = new DBObject();
-		
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int columnCount = rsmd.getColumnCount();
 		
+		DBObject dbObject = new DBObject(columnCount);
+		
 		for (int index = 1; index <= columnCount; index++) {
 
-			String column = JdbcUtils.lookupColumnName(rsmd, index);
-			JdbcPersistentProperty jdbcPersistentProperty = information.getMetaInfo().get(column.toLowerCase());
+			String column = JdbcUtils.lookupColumnName(rsmd, index).toLowerCase();
+			JdbcPersistentProperty jdbcPersistentProperty = information.getPropertyByFieldName(column);
 			if(jdbcPersistentProperty == null) {
 				continue;
 			}
 			
 			Object columnValue = getColumnValue(rs, index, jdbcPersistentProperty);			
-			dbObject.put(jdbcPersistentProperty.getField(), columnValue);
+			dbObject.add(jdbcPersistentProperty.getField(), columnValue);
 		}
 		
 		return dbObject;
