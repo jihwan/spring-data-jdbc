@@ -30,7 +30,6 @@ public interface SqlGenerator {
      */
     boolean isCompatible(DatabaseMetaData metadata) throws SQLException;
 
-
     String count(JdbcEntityInformation<?, ?> information);
 
     String deleteAll(JdbcEntityInformation<?, ?> information);

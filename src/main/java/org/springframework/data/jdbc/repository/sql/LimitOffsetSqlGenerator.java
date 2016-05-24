@@ -28,7 +28,6 @@ public class LimitOffsetSqlGenerator extends SimpleSqlGenerator {
     private static final List<String> SUPPORTED_PRODUCTS =
         asList("PostgreSQL", "H2", "HSQL Database Engine", "MySQL");
 
-
     @Override
     public boolean isCompatible(DatabaseMetaData metadata) throws SQLException {
         return SUPPORTED_PRODUCTS.contains(metadata.getDatabaseProductName());

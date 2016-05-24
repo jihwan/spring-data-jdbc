@@ -38,32 +38,37 @@ public class SimpleSqlGenerator implements SqlGenerator {
             COMMA = ", ",
             PARAM = " = ?";
 
-
+    @Override
     public boolean isCompatible(DatabaseMetaData metadata) throws SQLException {
         return true;
     }
 
-
+    @Override
     public String count(JdbcEntityInformation<?, ?> information) {
         return format("SELECT count(*) FROM %s", information.getEntityName());
     }
 
+    @Override
     public String deleteAll(JdbcEntityInformation<?, ?> information) {
         return format("DELETE FROM %s", information.getEntityName());
     }
 
+    @Override
     public String deleteById(JdbcEntityInformation<?, ?> information) {
         return deleteByIds(information, 1);
     }
 
+    @Override
     public String deleteByIds(JdbcEntityInformation<?, ?> information, int idsCount) {
         return deleteAll(information) + " WHERE " + idsPredicate(information, idsCount);
     }
 
+    @Override
     public String existsById(JdbcEntityInformation<?, ?> information) {
         return format("SELECT 1 FROM %s WHERE %s", information.getEntityName(), idPredicate(information));
     }
 
+    @Override
     public String insert(JdbcEntityInformation<?, ?> information, Map<String, Object> columns) {
 
         return format("INSERT INTO %s (%s) VALUES (%s)",
@@ -72,10 +77,12 @@ public class SimpleSqlGenerator implements SqlGenerator {
             repeat("?", COMMA, columns.size()));
     }
 
+    @Override
     public String selectAll(JdbcEntityInformation<?, ?> information) {
         return format("SELECT %s FROM %s", "*", information.getEntityName());
     }
 
+    @Override
     public String selectAll(JdbcEntityInformation<?, ?> information, Pageable page) {
         Sort sort = page.getSort() != null ? page.getSort() : sortById(information);
 
@@ -86,20 +93,24 @@ public class SimpleSqlGenerator implements SqlGenerator {
             page.getOffset() + 1, page.getOffset() + page.getPageSize());
     }
 
+    @Override
     public String selectAll(JdbcEntityInformation<?, ?> information, Sort sort) {
         return selectAll(information) + (sort != null ? orderByClause(sort) : "");
     }
 
+    @Override
     public String selectById(JdbcEntityInformation<?, ?> information) {
         return selectByIds(information, 1);
     }
 
+    @Override
     public String selectByIds(JdbcEntityInformation<?, ?> information, int idsCount) {
         return idsCount > 0
             ? selectAll(information) + " WHERE " + idsPredicate(information, idsCount)
             : selectAll(information);
     }
 
+    @Override
     public String update(JdbcEntityInformation<?, ?> information, Map<String, Object> columns) {
 
         return format("UPDATE %s SET %s WHERE %s",
@@ -107,7 +118,6 @@ public class SimpleSqlGenerator implements SqlGenerator {
             formatParameters(columns.keySet(), COMMA),
             idPredicate(information));
     }
-
 
     protected String orderByClause(Sort sort) {
         return " ORDER BY " + orderByExpression(sort);
@@ -128,7 +138,6 @@ public class SimpleSqlGenerator implements SqlGenerator {
     protected Sort sortById(JdbcEntityInformation<?, ?> information) {
         return new Sort(Direction.ASC, information.getIdAttributeNames());
     }
-
 
     private String idPredicate(JdbcEntityInformation<?, ?> information) {
         return formatParameters(information.getIdAttributeNames(), AND);
