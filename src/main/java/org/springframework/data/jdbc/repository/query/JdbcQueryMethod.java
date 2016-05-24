@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.data.jdbc.repository.Modifying;
 import org.springframework.data.jdbc.repository.Query;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
@@ -35,7 +36,24 @@ public class JdbcQueryMethod extends QueryMethod {
 		return targetType.cast(AnnotationUtils.getValue(annotation, attribute));
 	}
 
-	public boolean isProcedureQuery() {
-		return false;
+	@Override
+	public boolean isModifyingQuery() {
+		return null != AnnotationUtils.findAnnotation(method, Modifying.class);
 	}
+	
+	Class<?> getReturnType() {
+		return method.getReturnType();
+	}
+	
+	Class<?> getOwnerClass() {
+		return method.getDeclaringClass();
+	}
+	
+	String getMethodName() {
+		return method.getName();
+	}
+
+//	public boolean isProcedureQuery() {
+//		return false;
+//	}
 }

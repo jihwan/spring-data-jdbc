@@ -3,6 +3,7 @@ package org.springframework.data.jdbc.repository.query;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.repository.query.JdbcQueryExecution.CollectionExecution;
 import org.springframework.data.jdbc.repository.query.JdbcQueryExecution.SingleEntityExecution;
+import org.springframework.data.jdbc.repository.query.JdbcQueryExecution.ModifyingExecution;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.RepositoryQuery;
@@ -51,10 +52,12 @@ public abstract class AbstractJdbcQuery implements RepositoryQuery {
 		if (method.isStreamQuery()) {
 			throw new UnsupportedOperationException("method.isStreamQuery() is not support");
 //			return new StreamExecution();
-		} else if (method.isProcedureQuery()) {
-			throw new UnsupportedOperationException("method.isProcedureQuery() is not support");
+		}
+//		else if (method.isProcedureQuery()) {
+//			throw new UnsupportedOperationException("method.isProcedureQuery() is not support");
 //			return new ProcedureExecution();
-		} else if (method.isCollectionQuery()) {
+//		} 
+		else if (method.isCollectionQuery()) {
 			return new CollectionExecution();
 		} else if (method.isSliceQuery()) {
 			throw new UnsupportedOperationException("method.isSliceQuery() is not support");
@@ -63,8 +66,7 @@ public abstract class AbstractJdbcQuery implements RepositoryQuery {
 			throw new UnsupportedOperationException("method.isPageQuery() is not support");
 //			return new PagedExecution(method.getParameters());
 		} else if (method.isModifyingQuery()) {
-			throw new UnsupportedOperationException("method.isModifyingQuery() is not support");
-//			return method.getClearAutomatically() ? new ModifyingExecution(method, em) : new ModifyingExecution(method, null);
+			return new ModifyingExecution();
 		} else {
 			return new SingleEntityExecution();
 		}
@@ -74,4 +76,5 @@ public abstract class AbstractJdbcQuery implements RepositoryQuery {
 	public QueryMethod getQueryMethod() {
 		return this.method;
 	}
+	
 }
