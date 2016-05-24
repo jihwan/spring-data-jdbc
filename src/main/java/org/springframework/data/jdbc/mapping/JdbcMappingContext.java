@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.data.jdbc.repository.support.JdbcEntityInformation;
 import org.springframework.data.mapping.context.AbstractMappingContext;
@@ -19,17 +18,10 @@ public class JdbcMappingContext extends
 	/**
 	 * root entity 정보를 관리한다.
 	 */
-	Map<Class<?>, JdbcEntityInformation<?, Serializable>> map = new HashMap<Class<?>, JdbcEntityInformation<?, Serializable>>();
+	private Map<Class<?>, JdbcEntityInformation<?, Serializable>> map = new HashMap<Class<?>, JdbcEntityInformation<?, Serializable>>();
 	
-	Set<Class<?>> entitySet;
-	
-	public JdbcMappingContext(Set<Class<?>> initialEntitySet) {
-		this.entitySet = initialEntitySet;
-	}
-
 	@Override
 	protected <T> JdbcPersistentEntityImpl<?> createPersistentEntity(TypeInformation<T> typeInformation) {
-		
 		JdbcPersistentEntityImpl<T> jdbcPersistentEntityImpl = new JdbcPersistentEntityImpl<T>(typeInformation);
 		return jdbcPersistentEntityImpl;
 	}
@@ -37,7 +29,6 @@ public class JdbcMappingContext extends
 	@Override
 	protected JdbcPersistentProperty createPersistentProperty(Field field, PropertyDescriptor descriptor,
 			JdbcPersistentEntityImpl<?> owner, SimpleTypeHolder simpleTypeHolder) {
-		
 		JdbcPersistentPropertyImpl jdbcPersistentPropertyImpl = new JdbcPersistentPropertyImpl(field, descriptor, owner, simpleTypeHolder);
 		return jdbcPersistentPropertyImpl;
 	}
