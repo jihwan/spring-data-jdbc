@@ -20,9 +20,12 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	private JdbcMappingContext jdbcMappingContext;
 	
 	private String jdbcTemplateName;
-//	private Class<?> jdbcSqlDialectClazz;
 	
 	private JdbcTemplate jdbcTemplate;
+	
+	public void setJdbcTemplate(String jdbcTemplateName) {
+		this.jdbcTemplateName = jdbcTemplateName;
+	}
 	
 	@Override
 	public void setMappingContext(MappingContext<?, ?> mappingContext) {
@@ -30,14 +33,6 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 		this.jdbcMappingContext = JdbcMappingContext.class.cast(mappingContext);
 	}
 	
-	public void setJdbcTemplate(String jdbcTemplateName) {
-		this.jdbcTemplateName = jdbcTemplateName;
-	}
-	
-//	public void setJdbcSqlDialectClazz(Class<?> jdbcSqlDialect) {
-//		this.jdbcSqlDialectClazz = jdbcSqlDialect;
-//	}
-
 	@Override
 	protected RepositoryFactorySupport doCreateRepositoryFactory() {
 		return createRepositoryFactory(jdbcTemplate);
@@ -56,22 +51,6 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 		return resolveSqlGenerator;
 	}
 
-//	/**
-//	 * Returns a {@link RepositoryFactorySupport}.
-//	 * 
-//	 * @param jdbcTemplate
-//	 * @return
-//	 */
-//	protected RepositoryFactorySupport createRepositoryFactory(JdbcTemplate jdbcTemplate) {
-//		
-//		JdbcSqlDialect jdbcSqlDialect = createJdbcSqlDialect();
-//		return new JdbcRepositoryFactory(jdbcTemplate, jdbcMappingContext, jdbcSqlDialect);
-//	}
-//	
-//	protected JdbcSqlDialect createJdbcSqlDialect() {
-//		return (JdbcSqlDialect) BeanUtils.instantiate(jdbcSqlDialectClazz);
-//	}
-	
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		super.setBeanFactory(beanFactory);
@@ -84,7 +63,6 @@ public class JdbcRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	@Override
 	public void afterPropertiesSet() {
 		Assert.hasText(jdbcTemplateName);
-//		Assert.notNull(jdbcSqlDialectClazz);
 		super.afterPropertiesSet();
 	}
 }

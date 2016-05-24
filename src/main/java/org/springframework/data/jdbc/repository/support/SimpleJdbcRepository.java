@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,8 @@ import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.data.jdbc.repository.sql.SqlGenerator;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
@@ -23,7 +26,11 @@ import org.springframework.util.Assert;
  * @param <T>
  * @param <ID>
  */
+@Repository
+@Transactional(readOnly = true)
 public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID extends Serializable> implements JdbcRepository<T, ID> {
+	
+	private static final String ID_MUST_NOT_BE_NULL = "The given id must not be null!";
 	
 	final JdbcEntityInformation<T, ?> information;
 	final JdbcTemplate jdbcTemplate;
@@ -44,25 +51,30 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 	}
 	
 	@Override
-	public Iterable<T> findAll() {
+	public List<T> findAll() {
 		String sql = sqlGenerator.selectAll(information);
 		return jdbcTemplate.query(sql, this.beanPropertyMapper);
 	}
 	
 	@Override
-	public Iterable<T> findAll(Sort sort) {
+	public List<T> findAll(Sort sort) {
 		String sql = sqlGenerator.selectAll(information, sort);
 		return jdbcTemplate.query(sql, this.beanPropertyMapper);
 	}
 
 	@Override
 	public Page<T> findAll(Pageable pageable) {
+		
+		if(pageable == null) {
+			return new PageImpl<T>(findAll());
+		}
+		
 		String sql = sqlGenerator.selectAll(information, pageable);
 		return new PageImpl<T>(jdbcTemplate.query(sql, this.beanPropertyMapper), pageable, count());
 	}
 	
 	@Override
-	public Iterable<T> findAll(Iterable<ID> ids) {
+	public List<T> findAll(Iterable<ID> ids) {
         List<ID> idsList = toList(ids);
         if (idsList.isEmpty()) {
             return Collections.emptyList();
@@ -73,6 +85,9 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 	
 	@Override
 	public T findOne(ID id) {
+		
+		Assert.notNull(id, ID_MUST_NOT_BE_NULL); 
+		
 		List<T> entityOrEmpty = jdbcTemplate.query(
 				sqlGenerator.selectById(information), this.beanPropertyMapper, information.getCompositeIdAttributeValue(id).toArray());
 		return entityOrEmpty.isEmpty() ? null : entityOrEmpty.get(0);
@@ -80,6 +95,9 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 	
 	@Override
 	public boolean exists(ID id) {
+		
+		Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+		
 		List<Integer> object = jdbcTemplate.queryForList(
 				sqlGenerator.existsById(information), information.getCompositeIdAttributeValue(id).toArray(), Integer.class);
 		return !object.isEmpty();
@@ -90,6 +108,7 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 		return jdbcTemplate.queryForObject(sqlGenerator.count(information), Long.class);
 	}
 
+	@Transactional
 	@Override
 	public <S extends T> S save(S entity) {
 		
@@ -101,52 +120,99 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 		}
 	}
 
+	@Transactional
+	@Override
 	public <S extends T> S insert(S entity) {
 		
-		Map<String, Object> map = this.beanPropertyMapper.toMap(entity);
+		Assert.state(entity.isNew() == true, "The given entity psersisted status must be false.");
+		
+		Map<String, Object> columns = this.beanPropertyMapper.toMap(entity);
+		Object[] queryParams = columns.values().toArray();
+		
+		jdbcTemplate.update(sqlGenerator.insert(information, columns), queryParams);
 		
 		entity.persist(true);
 		return entity;
 	}
 	
+	@Transactional
+	@Override
 	public <S extends T> S update(S entity) {
 		
-		Map<String, Object> map = this.beanPropertyMapper.toMap(entity);
+		Assert.notNull(entity.getId(), "The given entity id must not be null.");
+		Assert.state(entity.isNew() == false, "The given entity psersisted status must be true.");
+		
+		Map<String, Object> columns = this.beanPropertyMapper.toMap(entity);
+		Map<String, Object> simpleColumns = information.removeIdAttribute(columns);
+		
+		List<Object> queryParams = new ArrayList<Object>(simpleColumns.values());
+		queryParams.addAll(information.getCompositeIdAttributeValue(entity.getId()));
+		
+		jdbcTemplate.update(sqlGenerator.update(information, simpleColumns), queryParams.toArray());
 		
 		entity.persist(true);
 		return entity;
 	}
 
+	@Transactional
 	@Override
-	public <S extends T> Iterable<S> save(Iterable<S> entities) {
+	public <S extends T> List<S> save(Iterable<S> entities) {
 		
-		for (S s : entities) {
-			save(s);
+		List<S> result = new ArrayList<S>();
+		
+		if (entities == null) {
+			return result;
 		}
 		
-		return entities;
+		for (S entity : entities) {
+			result.add(save(entity));
+		}
+		
+		return result;
 	}
 
+	@Transactional
 	@Override
 	public void delete(ID id) {
+		
+		Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+		
+		T entity = findOne(id);
+		if (entity == null) {
+			throw new EmptyResultDataAccessException(
+					String.format("No %s entity with id %s exists!", information.getJavaType(), id), 1);
+		}
+		
+		delete(entity);
 	}
 
+	@Transactional
 	@Override
 	public void delete(T entity) {
 		
+		Assert.notNull(entity, "The given entity must not be null!");
+		
+		jdbcTemplate.update(
+				sqlGenerator.deleteById(information), information.getCompositeIdAttributeValue(entity.getId()).toArray());
 		entity.persist(false);
 	}
 
+	@Transactional
 	@Override
 	public void delete(Iterable<? extends T> entities) {
+		
+		Assert.notNull(entities, "The given Iterable of entities not be null!");
 		
 		for (T t : entities) {
 			delete(t);
 		}
 	}
 
+	@Transactional
 	@Override
 	public void deleteAll() {
+		
+		jdbcTemplate.update(sqlGenerator.deleteAll(information));
 	}
 	
     @SuppressWarnings("hiding")
@@ -168,48 +234,7 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
         List<Object> result = new ArrayList<Object>();
         for (ID id : ids) {
             result.addAll(information.getCompositeIdAttributeValue(id));
-//            result.addAll(Arrays.asList(wrapToArray(id)));
         }
         return result.toArray();
     }
-    
-//    /**
-//     * Wraps the given object into an object array. If the object is an object
-//     * array, then it returns it as-is. If it's an array of primitives, then
-//     * it converts it into an array of primitive wrapper objects.
-//     */
-//    private Object[] wrapToArray(Object obj) {
-//        if (obj == null) {
-//            return new Object[0];
-//        }
-//        if (obj instanceof Object[]) {
-//            return (Object[]) obj;
-//        }
-//        if (obj.getClass().isArray()) {
-//            return toObjectArray(obj);
-//        }
-//        return new Object[]{ obj };
-//    }
-//    
-//    private Object[] toObjectArray(Object source) {
-//		if (source instanceof Object[]) {
-//			return (Object[]) source;
-//		}
-//		if (source == null) {
-//			return new Object[0];
-//		}
-//		if (!source.getClass().isArray()) {
-//			throw new IllegalArgumentException("Source is not an array: " + source);
-//		}
-//		int length = Array.getLength(source);
-//		if (length == 0) {
-//			return new Object[0];
-//		}
-//		Class<?> wrapperType = Array.get(source, 0).getClass();
-//		Object[] newArray = (Object[]) Array.newInstance(wrapperType, length);
-//		for (int i = 0; i < length; i++) {
-//			newArray[i] = Array.get(source, i);
-//		}
-//		return newArray;
-//	}
 }
