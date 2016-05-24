@@ -3,6 +3,7 @@ package org.springframework.data.jdbc.repository.support;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,11 +24,11 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 	extends PersistentEntityInformation<T, ID>
 	implements JdbcEntityInformation<T, ID> {
 	
-	final JdbcPersistentEntity<T> persistentEntity;
-	final JdbcMappingContext jdbcMappingContext;
-	final MetaExtractor metaExtractor;
+	private final JdbcPersistentEntity<T> persistentEntity;
+	private final JdbcMappingContext jdbcMappingContext;
+	private final MetaExtractor metaExtractor;
 	
-	protected GenericConversionService conversionService = new GenericConversionService();
+	private final GenericConversionService conversionService = new GenericConversionService();
 
 	public JdbcPersistableEntityInformation(JdbcPersistentEntity<T> entity, JdbcMappingContext jdbcMappingContext) {
 		super(entity);
@@ -53,32 +54,16 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 	}
 	
 	@Override
-	public Map<String, JdbcPersistentProperty> getMetaInfo() {
-		return this.metaExtractor.getMetaInfo();
-	}
-	
-	@Override
-	public JdbcPersistentEntity<T> getPersistentEntity() {
-		return persistentEntity;
-	}
-	
-	@Override
-	public JdbcPersistentEntity<?> getPersistentEntity(Class<?> clazz) {
-		return jdbcMappingContext.getPersistentEntity(clazz);
-	}
-	
-	@Override
-	public List<Object> getCompositeIdAttributeValue(Object id) {
+	public List<Object> getCompositeIdAttributeValue(final Serializable id) {
 		
-		
-		JdbcPersistentEntity<?> pe = getPersistentEntity(id.getClass());
+		JdbcPersistentEntity<?> idEntity = getPersistentEntity(id.getClass());
 		
 		final List<Object> ids = new ArrayList<Object>();
 		
 		final PersistentPropertyAccessor accessor = 
-				new ConvertingPropertyAccessor(pe.getPropertyAccessor(id), conversionService);
+				new ConvertingPropertyAccessor(idEntity.getPropertyAccessor(id), conversionService);
 		
-		pe.doWithProperties(new PropertyHandler<JdbcPersistentProperty>() {
+		idEntity.doWithProperties(new PropertyHandler<JdbcPersistentProperty>() {
 			@Override
 			public void doWithPersistentProperty(JdbcPersistentProperty persistentProperty) {
 				Object value = accessor.getProperty(persistentProperty);
@@ -89,15 +74,46 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 		return ids;
 	}
 	
-//	@Override
-//	public Object[] getCompositeIdAttributeValue(Iterable<Serializable> ids) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	@Override
+	public Map<String, Object> removeIdAttribute(final Map<String, ?> entityMap) {
+		
+		Map<String, Object> retMap = new HashMap<String, Object>(entityMap);
+		
+		for (Iterator<String> iterator = retMap.keySet().iterator(); iterator.hasNext();) {
+			String key = iterator.next();
+			if (getIdAttributeNames().contains(key)) {
+				iterator.remove();
+			}
+		}
+		
+		return retMap;
+	}
+	
+	
+	@Override
+	public JdbcPersistentProperty getPropertyByFieldName(final String fieldName) {
+		return this.metaExtractor.getMetaInfo().get(fieldName);
+	}
+	
+	@Override
+	public JdbcPersistentEntity<T> getRootPersistentEntity() {
+		return persistentEntity;
+	}
+	
+	@Override
+	public JdbcPersistentEntity<?> getPersistentEntity(Class<?> clazz) {
+		return jdbcMappingContext.getPersistentEntity(clazz);
+	}
+	
 	
 	class MetaExtractor {
 		
+		/**
+		 * key is a Entity class real Field names.
+		 */
 		final Map<String, JdbcPersistentProperty> map = new HashMap<String, JdbcPersistentProperty>();
+		
+		// id fields
 		final List<String> id = new ArrayList<String>();
 		
 		MetaExtractor() {
@@ -155,37 +171,4 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 			});
 		}
 	}
-	
-//	@Override
-//	public JdbcPersistentEntity<T> getJdbcPersistentEntity() {
-//		return this.persistentEntity;
-//	}
-	
-//	@Override
-//	public JdbcMappingContext getJdbcMappingContext() {
-//		return this.jdbcMappingContext;
-//	}
-	
-//	@Override
-//	public SingularAttribute<? super T, ?> getIdAttribute() {
-//		return null;
-//	}
-//
-//	@Override
-//	public boolean hasCompositeId() {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public Iterable<String> getIdAttributeNames() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public Object getCompositeIdAttributeValue(Serializable id, String idAttribute) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 }
