@@ -28,6 +28,8 @@ import org.springframework.util.Assert;
 
 /**
  * 
+ * @author Tomasz Nurkiewicz 
+ * @author Jakub Jirutka
  * @author Jihwan Hwang
  *
  * @param <T>
