@@ -1,6 +1,9 @@
 package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,11 +13,15 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.repository.JdbcRepository;
 import org.springframework.data.jdbc.repository.sql.SqlGenerator;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -28,7 +35,7 @@ import org.springframework.util.Assert;
  */
 @Repository
 @Transactional(readOnly = true)
-public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID extends Serializable> implements JdbcRepository<T, ID> {
+public class SimpleJdbcRepository<T extends Persistable<ID>, ID extends Serializable> implements JdbcRepository<T, ID> {
 	
 	private static final String ID_MUST_NOT_BE_NULL = "The given id must not be null!";
 	
@@ -112,7 +119,7 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 	@Override
 	public <S extends T> S save(S entity) {
 		
-		if (information.isNew(entity)) {
+		if (entity.isNew()) {
 			return insert(entity);
 		}
 		else {
@@ -126,12 +133,53 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 		
 		Assert.state(entity.isNew() == true, "The given entity psersisted status must be false.");
 		
+		if (information.getId(entity) != null) {
+			// manual assigned key
+			return insertManualAssignedKey(entity);
+		}
+		else {
+			// auto generate key
+			return insertAutoGenerateKey(entity);
+		}
+	}
+	
+	protected <S extends T> S insertManualAssignedKey(S entity) {
+		
 		Map<String, Object> columns = this.beanPropertyMapper.toMap(entity);
 		Object[] queryParams = columns.values().toArray();
-		
 		jdbcTemplate.update(sqlGenerator.insert(information, columns), queryParams);
 		
-		entity.persist(true);
+		if (entity instanceof JdbcPersistable) {
+			@SuppressWarnings("unchecked")
+			JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(entity);
+			cast.persist(true);
+		}
+		
+		return entity;
+	}
+	
+	protected <S extends T> S insertAutoGenerateKey(S entity) {
+		
+		Map<String, Object> columns = this.beanPropertyMapper.toMap(entity);
+		Object[] queryParams = columns.values().toArray();
+		KeyHolder key = new GeneratedKeyHolder();
+		
+		jdbcTemplate.update(new PreparedStatementCreator() {
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				PreparedStatement ps = 
+						con.prepareStatement(sqlGenerator.insert(information, columns), 
+								new String[]{information.getIdAttributeNames().get(0)});
+				for (int i = 0; i < queryParams.length; ++i) {
+					ps.setObject(i + 1, queryParams[i]);
+				}
+				return ps;
+			}
+		}, key);
+		
+		
+		information.setIdAttributeVAlue(entity, key.getKey());
+		
 		return entity;
 	}
 	
@@ -150,7 +198,11 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 		
 		jdbcTemplate.update(sqlGenerator.update(information, simpleColumns), queryParams.toArray());
 		
-		entity.persist(true);
+		if (entity instanceof JdbcPersistable) {
+			@SuppressWarnings("unchecked")
+			JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(entity);
+			cast.persist(true);
+		}
 		return entity;
 	}
 
@@ -194,7 +246,12 @@ public class SimpleJdbcRepository<T extends JdbcPersistable<T, Serializable>, ID
 		
 		jdbcTemplate.update(
 				sqlGenerator.deleteById(information), information.getCompositeIdAttributeValue(entity.getId()).toArray());
-		entity.persist(false);
+		
+		if (entity instanceof JdbcPersistable) {
+			@SuppressWarnings("unchecked")
+			JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(entity);
+			cast.persist(false);
+		}
 	}
 
 	@Transactional
