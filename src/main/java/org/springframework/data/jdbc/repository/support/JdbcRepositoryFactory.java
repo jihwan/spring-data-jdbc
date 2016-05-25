@@ -2,6 +2,7 @@ package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
 
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntityImpl;
@@ -49,7 +50,7 @@ public class JdbcRepositoryFactory extends RepositoryFactorySupport {
 	@Override
 	public <T, ID extends Serializable> JdbcEntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
 		
-		if(JdbcPersistable.class.isAssignableFrom(domainClass)) {
+		if(JdbcPersistable.class.isAssignableFrom(domainClass) || Persistable.class.isAssignableFrom(domainClass)) {
 			JdbcPersistentEntityImpl<?> entity = jdbcMappingContext.getPersistentEntity(domainClass);
 			JdbcEntityInformation information = new JdbcPersistableEntityInformation(entity, jdbcMappingContext);
 			jdbcMappingContext.addEntityInformation(domainClass, information);
