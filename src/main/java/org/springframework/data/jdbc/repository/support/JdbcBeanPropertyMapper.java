@@ -80,10 +80,13 @@ public class JdbcBeanPropertyMapper<T> implements BeanPropertyMapper<T> {
 		DBObject dbObject = extractResultSet(rs);
 		
 		T read = read(persistentEntity, dbObject);
+
+		if (read instanceof JdbcPersistable) {
+			@SuppressWarnings("unchecked")
+			JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(read);
+			cast.persist(true);
+		}
 		
-		@SuppressWarnings("unchecked")
-		JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(read);
-		cast.persist(true);
 		return read;
 	}
 	
