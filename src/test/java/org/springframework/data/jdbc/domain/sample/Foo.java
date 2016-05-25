@@ -81,8 +81,7 @@ public class Foo
 	}
 
 	@Override
-	public Foo persist(boolean persisted) {
+	public void persist(boolean persisted) {
 		this.persisted = persisted;
-		return this;
 	}
 }

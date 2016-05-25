@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import org.springframework.data.jdbc.domain.sample.Bar;
 import org.springframework.data.jdbc.domain.sample.Foo;
 import org.springframework.data.jdbc.domain.sample.FooDao;
 import org.springframework.data.jdbc.domain.sample2.FooDaoCustom;
+import org.springframework.data.jdbc.domain.sample3.Zoo;
+import org.springframework.data.jdbc.domain.sample3.ZooDao;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.test.context.ContextConfiguration;
@@ -44,6 +47,9 @@ public class JdbcRepositoriesTest {
 	
 	@Autowired
 	FooDao fooDao;
+	
+	@Autowired
+	ZooDao zooDao;
 	
 	Bar bar1;
 	Foo foo1;
@@ -85,20 +91,30 @@ public class JdbcRepositoriesTest {
 	}
 	
 	@Test
-	public void test() {
+	public void testZoo() {
+		assertNotNull(zooDao);
+		
+		Zoo zoo = new Zoo();
+		zoo.setName("zoo_name");
+		zooDao.save(zoo);
+	}
+	
+	@Ignore
+	@Test
+	public void testFoo() {
 		
 		// Foo, Bar, Address, Zoo
 		assertEquals(4, mappingContext.getPersistentEntities().size());
 		
 		List<Foo> list = fooDao.save(Lists.newArrayList(foo1, foo2, foo3));
 		for (Foo foo : list) {
-			assertTrue(foo.isPersisted());
+			assertFalse(foo.isNew());
 		}
 		
 		assertEquals(1, fooDao.updateByName("foo1_2", "a1", "b1"));
 		
 		Foo findOne = fooDao.findOne(bar1);
-		assertTrue(findOne.isPersisted());
+		assertFalse(findOne.isNew());
 		assertTrue(findOne.getId().equals(bar1));
 		
 		assertEquals(1, fooDao.deleteByName("foo1_2"));
@@ -114,8 +130,8 @@ public class JdbcRepositoriesTest {
 		assertEquals("foo2", list.get(1).getName());
 		
 		// page
-		for (Foo myFoo : fooDao.findAll(new PageRequest(1, 2, new Sort(new Sort.Order(Direction.ASC, "name"))))) {
-			System.err.println(myFoo + "\t" + myFoo.isPersisted());
+		for (Foo myFoo : fooDao.findAll(new PageRequest(1, 1, new Sort(new Sort.Order(Direction.ASC, "name"))))) {
+			System.err.println(myFoo + "\t" + myFoo.isNew());
 		}
 		
 		Foo customMethod = fooDao.customMethod(foo1);

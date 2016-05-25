@@ -33,10 +33,21 @@ public class InitializeTables implements InitializingBean {
 	@Multiline
 	final String FOO_DDL = "";
 	
+	/**
+	CREATE TABLE zoo (
+	    id bigint not null auto_increment,
+	    name VARCHAR(255)
+	)
+	*/
+	@Multiline
+	final String ZOO_DDL = "";
+	
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		
 		jdbcTemplate.execute("DROP TABLE foo IF EXISTS");
+		jdbcTemplate.execute("DROP TABLE zoo IF EXISTS");
 		
 //		StringBuilder ddl = new StringBuilder();
 //		ddl.append("CREATE TABLE foo (")
@@ -51,5 +62,6 @@ public class InitializeTables implements InitializingBean {
 //		jdbcTemplate.execute(ddl.toString());
 		
 		jdbcTemplate.execute(FOO_DDL);
+		jdbcTemplate.execute(ZOO_DDL);
 	}
 }
