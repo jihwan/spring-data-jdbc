@@ -274,26 +274,26 @@ public class SimpleJdbcRepository<T extends Persistable<ID>, ID extends Serializ
 		jdbcTemplate.update(sqlGenerator.deleteAll(information));
 	}
 	
-    @SuppressWarnings("hiding")
+	@SuppressWarnings("hiding")
 	private <T>List<T> toList(Iterable<T> iterable) {
 
-        if (iterable instanceof List) {
-            return (List<T>) iterable;
-        }
+		if (iterable instanceof List) {
+			return (List<T>) iterable;
+		}
 
         List<T> result = new ArrayList<T>();
         for (T item : iterable) {
-            result.add(item);
+        	result.add(item);
         }
-
+        
         return result;
-    }
+	}
     
 	private Object[] flatten(List<ID> ids) {
-        List<Object> result = new ArrayList<Object>();
-        for (ID id : ids) {
-            result.addAll(information.getCompositeIdAttributeValue(id));
-        }
-        return result.toArray();
-    }
+		List<Object> result = new ArrayList<Object>();
+		for (ID id : ids) {
+			result.addAll(information.getCompositeIdAttributeValue(id));
+		}
+		return result.toArray();
+	}
 }
