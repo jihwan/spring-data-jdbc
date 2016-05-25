@@ -281,12 +281,12 @@ public class SimpleJdbcRepository<T extends Persistable<ID>, ID extends Serializ
 			return (List<T>) iterable;
 		}
 
-        List<T> result = new ArrayList<T>();
-        for (T item : iterable) {
-        	result.add(item);
-        }
-        
-        return result;
+		List<T> result = new ArrayList<T>();
+		for (T item : iterable) {
+			result.add(item);
+		}
+		
+		return result;
 	}
     
 	private Object[] flatten(List<ID> ids) {
