@@ -31,11 +31,9 @@ public class AbstractJdbcPersistable<T, ID extends Serializable> implements Jdbc
 		return !persisted;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public T persist(boolean persisted) {
+	public void persist(boolean persisted) {
 		this.persisted = persisted;
-		return (T)this;
 	}
 	
 	@Override
