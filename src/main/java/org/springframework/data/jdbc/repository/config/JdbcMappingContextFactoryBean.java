@@ -15,6 +15,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.annotation.Persistent;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.domain.JdbcPersistable;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.repository.config.RepositoryConfigurationSource;
@@ -22,7 +23,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link JdbcPersistable}을 implementation 한 jdbc Domain entity class 목록을 찾아 등록 합니다.
+ * {@link Persistable} or {@link JdbcPersistable}을 implementation 한 jdbc Domain entity class 목록을 찾아 등록 합니다.
  * entity class를 찾기 위해서는, {@link EnableJdbcRepositories#basePackageClasses()} 나, {@link EnableJdbcRepositories#basePackages()} 에 명시 해야 합니다.
  * 
  * @author Jihwan Hwang
@@ -89,6 +90,7 @@ class JdbcMappingContextFactoryBean
 				new ClassPathScanningCandidateComponentProvider(false);
 		scanner.setEnvironment(applicationContext.getEnvironment());
 		scanner.setResourceLoader(this.resourceLoader);
+		scanner.addIncludeFilter(new AssignableTypeFilter(Persistable.class));
 		scanner.addIncludeFilter(new AssignableTypeFilter(JdbcPersistable.class));
 		scanner.addIncludeFilter(new AnnotationTypeFilter(Persistent.class));
 		for (String basePackage : getBasePackages()) {
