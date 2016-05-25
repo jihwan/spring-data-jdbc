@@ -6,9 +6,9 @@ spring-data-commons framework를 확장하여 spring-data-jpa와 같은 기능�
 iBatis or MyBatis를 사용하거나, hibernate와 jdbcTemplate을 혼용 하여 사용 하는 방식 보다
 spring에서 제공하는 막강 파워 jdbcTemplate 만을 가지고 할 수는 없을까 하고, 고민을 합니다.
 
-이것을 만들기 까지 아래의 글과 소스코드를 참고 하고, 일부는 변경없이 인용 하였습니다.
-[Java에서 XML없이 SQL개발하기 by 정상혁](http://blog.benelog.net/2708621)
-[benelog/multiline](https://github.com/benelog/multiline)
+이것을 만들기 까지 아래의 글과 소스코드를 참고 하고, 일부 소스는 변경없이 인용 하였습니다.
+[Java에서 XML없이 SQL개발하기 by 정상혁](http://blog.benelog.net/2708621)<br>
+[benelog/multiline](https://github.com/benelog/multiline)<br>
 [jirutka/spring-data-jdbc-repository](https://github.com/jirutka/spring-data-jdbc-repository)
 
 # candidate domain entity class
