@@ -12,7 +12,7 @@ spring에서 제공하는 막강 파워 jdbcTemplate 만을 가지고 할 수는
 [jirutka/spring-data-jdbc-repository](https://github.com/jirutka/spring-data-jdbc-repository)
 
 # candidate domain entity class
-JdbcPersistable or Persistentable interface를 구현 해야 하는 제약 사항이 있습니다.
+JdbcPersistable or Persistable interface를 구현 해야 하는 제약 사항이 있습니다.
 
 key가 되는 field에는 Id annotation을 붙여 줘야 합니다.
 
