@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.convert.support.GenericConversionService;
-import org.springframework.data.jdbc.domain.JdbcPersistable;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntity;
 import org.springframework.data.jdbc.mapping.JdbcPersistentEntityImpl;
@@ -19,8 +19,9 @@ import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.mapping.model.ConvertingPropertyAccessor;
 import org.springframework.data.repository.core.support.PersistentEntityInformation;
+import org.springframework.util.Assert;
 
-public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Serializable>, ID extends Serializable> 
+public class JdbcPersistableEntityInformation<T extends Persistable<ID>, ID extends Serializable> 
 	extends PersistentEntityInformation<T, ID>
 	implements JdbcEntityInformation<T, ID> {
 	
@@ -36,6 +37,9 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 		this.jdbcMappingContext = jdbcMappingContext;
 		
 		this.metaExtractor = new MetaExtractor();
+		
+		
+//		persistentEntity.getIdentifierAccessor(entity).
 	}
 
 	@Override
@@ -72,6 +76,18 @@ public class JdbcPersistableEntityInformation<T extends JdbcPersistable<T, Seria
 		});
 		
 		return ids;
+	}
+	
+	@Override
+	public void setIdAttributeValue(final T entity, final Serializable id) {
+		
+		Assert.notNull(entity);
+		Assert.notNull(id);
+		
+		PersistentPropertyAccessor accessor = 
+				new ConvertingPropertyAccessor(this.persistentEntity.getPropertyAccessor(entity), conversionService);
+		
+		accessor.setProperty(this.persistentEntity.getIdProperty(), id);
 	}
 	
 	@Override

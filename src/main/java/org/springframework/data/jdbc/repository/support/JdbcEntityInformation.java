@@ -26,11 +26,17 @@ public interface JdbcEntityInformation<T, ID extends Serializable> extends Entit
 	List<String> getIdAttributeNames();
 	
 	/**
-	 * 
+	 * domain entity id 값 목록을 리턴. 
 	 * @param id
 	 * @return {@link List} (Id field values)
 	 */
 	List<Object> getCompositeIdAttributeValue(final Serializable id);
+	
+	/**
+	 * auto increment id를 entity object에 setting 한다.
+	 * @param id
+	 */
+	void setIdAttributeValue(final T entity, final Serializable id);
 	
 	/**
 	 * id값을 포함한 모든 field 값중, id key를 제거한 순수 column 젗보로 다시 리턴.

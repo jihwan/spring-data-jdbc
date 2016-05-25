@@ -178,7 +178,7 @@ public class SimpleJdbcRepository<T extends Persistable<ID>, ID extends Serializ
 		}, key);
 		
 		
-		information.setIdAttributeVAlue(entity, key.getKey());
+		information.setIdAttributeValue(entity, key.getKey());
 		
 		return entity;
 	}
