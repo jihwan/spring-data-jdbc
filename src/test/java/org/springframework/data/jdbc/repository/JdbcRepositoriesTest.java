@@ -91,6 +91,7 @@ public class JdbcRepositoriesTest {
 		zooDao.deleteAll();
 	}
 	
+	// auto generate key
 	@Test
 	public void testZoo() {
 		
@@ -111,6 +112,7 @@ public class JdbcRepositoriesTest {
 		assertTrue(findOne.isNew());
 	}
 	
+	// manual assign key
 	@Test
 	public void testFoo() {
 		
