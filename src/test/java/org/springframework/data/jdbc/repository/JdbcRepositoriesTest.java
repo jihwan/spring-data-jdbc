@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +65,7 @@ public class JdbcRepositoriesTest {
 	public void before() throws SQLException {
 		assertNotNull(context);
 		assertNotNull(fooDao);
+		assertNotNull(zooDao);
 		
 		Address address = new Address();
 		address.setStreet("street1");
@@ -88,18 +88,29 @@ public class JdbcRepositoriesTest {
 		bar4 = new Bar("a4", "b4");
 		
 		fooDao.deleteAll();
+		zooDao.deleteAll();
 	}
 	
 	@Test
 	public void testZoo() {
-		assertNotNull(zooDao);
 		
 		Zoo zoo = new Zoo();
 		zoo.setName("zoo_name");
+		assertTrue(zoo.isNew());
+		
 		zooDao.save(zoo);
+		assertNotNull(zoo.getId());
+		assertFalse(zoo.isNew());
+		
+		Zoo findOne = zooDao.findOne(zoo.getId());
+		assertNotNull(findOne);
+		assertEquals(zoo, findOne);
+		assertFalse(zoo.isNew());
+		
+		zooDao.delete(findOne);
+		assertTrue(findOne.isNew());
 	}
 	
-	@Ignore
 	@Test
 	public void testFoo() {
 		
