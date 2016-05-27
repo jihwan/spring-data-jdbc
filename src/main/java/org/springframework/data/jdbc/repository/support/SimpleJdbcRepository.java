@@ -254,6 +254,8 @@ public class SimpleJdbcRepository<T extends Persistable<ID>, ID extends Serializ
 			JdbcPersistable<T, ?> cast = JdbcPersistable.class.cast(entity);
 			cast.persist(false);
 		}
+		
+		information.setIdAttributeValue(entity, null);
 	}
 
 	@Transactional
