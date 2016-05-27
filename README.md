@@ -13,24 +13,16 @@
 
 # candidate domain entity class
 [Persistable](https://github.com/spring-projects/spring-data-commons/blob/master/src/main/java/org/springframework/data/domain/Persistable.java) or [JdbcPersistable](https://github.com/jihwan/spring-data-jdbc/blob/master/src/main/java/org/springframework/data/jdbc/domain/JdbcPersistable.java) interface를 구현 해야 하는 제약 사항이 있습니다.
-
-primary key가 되는 field에는 [@Id](https://github.com/spring-projects/spring-data-commons/blob/master/src/main/java/org/springframework/data/annotation/Id.java) annotation을 붙여 줘야 합니다.
-
-모든 java class의 field명은 database table의 field명과 같아야 하는 제약 사항도 있습니다.
-
-역시 이 모든게 불변합니다. [JPA](http://www.tutorialspoint.com/jpa/index.htm)와 [JPA](http://www.tutorialspoint.com/jpa/index.htm) 구현체를 학습 하는 것이 더 좋겠습니다.
-
-# Entity with auto-generated key
+두 interface는 database table의 primary key field 생성 전략에 따라 선택 되어야 하고, 그에 따라 `isNew()` 메소드를 구현 해 주어야 하는 규칙 혹은 제약 사항이 있습니다. 
+### 자동 증가 key field
+pk 값은 insert시 dbms로 부터 할당 받습니다. 그렇다면 java 객체가 database에 영속 되기 직전에는 값이 null입니다.
+따라서, `isNew()` 구현은 java id 멤버변수에 대한 null 테스트 코드로 구현하면 됩니다.
 ```java
 @Persistent @Data
 public class Zoo implements Persistable<Long> {
 
-	private static final long serialVersionUID = -6427178169835379151L;
-
 	@Id
 	private Long id;
-	
-	private String name;
 
 	@Override
 	public Long getId() {
@@ -43,4 +35,52 @@ public class Zoo implements Persistable<Long> {
 	}
 }
 ```
+### 수동 설정 key field
+application business logic에서 생성한 값으로 database pk로 사용할 경우는, 앞의 자동증가 key field에서 알아 보았듯이 java 객체 id 멤버 변수의 null 테스트 코드로는 불가능 합니다. 영속화 상태 자체를 정보로 가지고 있어야 합니다.
+따라서, entity 객체는 `boolean persisted = false;` 와 같이 영속 상태 관리를 합니다. persisted field 상태 수정은 [SimpleJdbcRepository](https://github.com/jihwan/spring-data-jdbc/blob/master/src/main/java/org/springframework/data/jdbc/repository/support/SimpleJdbcRepository.java) 내부에서 이루어 지도록 하였습니다.
 
+```java
+@Persistent @Data
+public class Foo implements JdbcPersistable<Foo, Bar> {
+
+	private transient boolean persisted; // 영속화 대상 field가 아니므로 transient modifier 사용
+	
+	@Id
+	Bar bar;
+	
+	@Reference
+	Address addR;
+	
+	String name;
+
+	public Foo() {}
+	
+	public Foo(Bar bar) {
+		this.bar = bar;
+	}
+	
+	public static Foo instance(Bar bar) {
+		Foo foo = new Foo(bar);
+		return foo;
+	}
+	
+	@Override
+	public Bar getId() {
+		return this.bar;
+	}
+	
+	@Override @Transient
+	public boolean isNew() {
+		return !persisted;
+	}
+
+    // SimpleJdbcRepository 내부에서 영속화 제어를 한다.
+    // application 코드에서는 이 함수를 호출 하면 안되는 제약 사항이 있음
+	@Override
+	public void persist(boolean persisted) {
+		this.persisted = persisted;
+	}
+}
+```
+# 테스트 코드
+[Go](https://github.com/jihwan/spring-data-jdbc/blob/master/src/test/java/org/springframework/data/jdbc/repository/JdbcRepositoriesTest.java)
