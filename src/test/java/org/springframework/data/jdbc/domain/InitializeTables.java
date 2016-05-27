@@ -49,19 +49,26 @@ public class InitializeTables implements InitializingBean {
 		jdbcTemplate.execute("DROP TABLE foo IF EXISTS");
 		jdbcTemplate.execute("DROP TABLE zoo IF EXISTS");
 		
-//		StringBuilder ddl = new StringBuilder();
-//		ddl.append("CREATE TABLE foo (")
-//		.append("a VARCHAR(255),")
-//		.append("b VARCHAR(255),")
-//		.append("street VARCHAR(255),")
-//		.append("city VARCHAR(255),")
-//		.append("no number,")
-//		.append("name VARCHAR(255),")
-//		.append(")")
-//		;
-//		jdbcTemplate.execute(ddl.toString());
+		StringBuilder fooddl = new StringBuilder();
+		fooddl.append("CREATE TABLE foo (")
+		.append("a VARCHAR(255),")
+		.append("b VARCHAR(255),")
+		.append("street VARCHAR(255),")
+		.append("city VARCHAR(255),")
+		.append("no number,")
+		.append("name VARCHAR(255)")
+		.append(")")
+		;
+		jdbcTemplate.execute(fooddl.toString());
+		StringBuilder zooddl = new StringBuilder();
+		zooddl.append("CREATE TABLE zoo (")
+		.append("id bigint not null auto_increment,")
+		.append("name VARCHAR(255)")
+		.append(")")
+		;
+		jdbcTemplate.execute(zooddl.toString());
 		
-		jdbcTemplate.execute(FOO_DDL);
-		jdbcTemplate.execute(ZOO_DDL);
+//		jdbcTemplate.execute(FOO_DDL);
+//		jdbcTemplate.execute(ZOO_DDL);
 	}
 }
