@@ -36,7 +36,7 @@ public class Zoo implements Persistable<Long> {
 }
 ```
 ### 수동 설정 key field
-application business logic에서 생성한 값으로 database pk로 사용할 경우는, 앞의 자동증가 key field에서 알아 보았듯이 java 객체 id 멤버 변수의 null 테스트 코드로는 불가능 합니다. 영속화 상태 자체를 정보로 가지고 있어야 합니다.
+application business logic에서 생성한 값으로 database pk로 사용할 경우는, 앞의 자동증가 key field에서 알아 보았듯이 java 객체 id 멤버 변수의 null 테스트 코드로는 불가능 합니다. **영속화 상태 자체를 정보로 가지고 있어야 합니다.**
 따라서, entity 객체는 `boolean persisted = false;` 와 같이 영속 상태 관리를 합니다. persisted field 상태 수정은 [SimpleJdbcRepository](https://github.com/jihwan/spring-data-jdbc/blob/master/src/main/java/org/springframework/data/jdbc/repository/support/SimpleJdbcRepository.java) 내부에서 이루어 지도록 하였습니다.
 
 ```java
