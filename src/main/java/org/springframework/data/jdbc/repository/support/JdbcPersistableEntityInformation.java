@@ -2,6 +2,7 @@ package org.springframework.data.jdbc.repository.support;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,9 +38,6 @@ public class JdbcPersistableEntityInformation<T extends Persistable<ID>, ID exte
 		this.jdbcMappingContext = jdbcMappingContext;
 		
 		this.metaExtractor = new MetaExtractor();
-		
-		
-//		persistentEntity.getIdentifierAccessor(entity).
 	}
 
 	@Override
@@ -60,29 +58,35 @@ public class JdbcPersistableEntityInformation<T extends Persistable<ID>, ID exte
 	@Override
 	public List<Object> getCompositeIdAttributeValue(final Serializable id) {
 		
-		JdbcPersistentEntity<?> idEntity = getPersistentEntity(id.getClass());
+		if (persistentEntity.getIdProperty().isAssociation()) {
+			
+			JdbcPersistentEntity<?> idEntity = getPersistentEntity(id.getClass());
+			
+			List<Object> ids = new ArrayList<Object>();
+			PersistentPropertyAccessor accessor = 
+					new ConvertingPropertyAccessor(idEntity.getPropertyAccessor(id), conversionService);
+			idEntity.doWithProperties(new PropertyHandler<JdbcPersistentProperty>() {
+				@Override
+				public void doWithPersistentProperty(JdbcPersistentProperty persistentProperty) {
+					Object value = accessor.getProperty(persistentProperty);
+					ids.add(value);
+				}
+			});
+			
+			return ids;
+		}
+		else {
+			return Collections.singletonList(id);
+		}
+	
 		
-		final List<Object> ids = new ArrayList<Object>();
-		
-		final PersistentPropertyAccessor accessor = 
-				new ConvertingPropertyAccessor(idEntity.getPropertyAccessor(id), conversionService);
-		
-		idEntity.doWithProperties(new PropertyHandler<JdbcPersistentProperty>() {
-			@Override
-			public void doWithPersistentProperty(JdbcPersistentProperty persistentProperty) {
-				Object value = accessor.getProperty(persistentProperty);
-				ids.add(value);
-			}
-		});
-		
-		return ids;
 	}
 	
 	@Override
 	public void setIdAttributeValue(final T entity, final Serializable id) {
 		
 		Assert.notNull(entity);
-		Assert.notNull(id);
+//		Assert.notNull(id);
 		
 		PersistentPropertyAccessor accessor = 
 				new ConvertingPropertyAccessor(this.persistentEntity.getPropertyAccessor(entity), conversionService);
