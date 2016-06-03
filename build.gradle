@@ -23,12 +23,12 @@ dependencies {
 	compile ('org.springframework:spring-jdbc:4.+')
 	compile ('org.springframework.data:spring-data-commons:1.+')
 //	compile ('org.eclipse.persistence:javax.persistence:2+')
+	compile ('com.querydsl:querydsl-sql:4.+')
 	
-
 	
     testCompile ('junit:junit:4+')
     testCompile ('org.springframework:spring-test:4.+')
-    testCompile ('org.springframework.boot:spring-boot-starter-jdbc:1.+')
+    compile ('org.springframework.boot:spring-boot-starter-jdbc:1.+')
     testCompile ('com.h2database:h2:1.4.191')
 	
     testCompile ('org.projectlombok:lombok:1.16.6')
