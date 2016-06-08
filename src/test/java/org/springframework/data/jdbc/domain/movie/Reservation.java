@@ -23,8 +23,8 @@ public class Reservation {
 	
 	public Reservation(Customer customer, Showing showing, int audienceCount) {
 		
-		this.customer = customer;
-		this.showing = showing;
+//		this.customer = customer;
+//		this.showing = showing;
 		this.fee = showing.calulateFee().times(audienceCount);
 		this.audienceCount = audienceCount;
 		
